@@ -1,4 +1,5 @@
 tiktoken
 colorama
 PyGithub
+flake8
 pyperclip
