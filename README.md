@@ -31,7 +31,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python codebase-digest [path_to_directory] [options]
+cdigest [path_to_directory] [options]
 ```
 
 ## Options
@@ -51,7 +51,7 @@ path_to_directory: Path to the directory you want to analyze.
 ```
 
 ```bash
-python codebase-digest.py my_project -d 3 -o json --show-size --ignore-ext .pyc .log
+cdigest my_project -d 3 -o json --show-size --ignore-ext .pyc .log
 ```
 
 # 10 LLM Prompts for Enhanced Codebase Analysis 

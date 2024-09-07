@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="codebase-digest",
-    version='0.1.9',
+    version='0.1.11',
     author="Kamil Stanuch",
     description="Consolidates and analyzes codebases for insights.",
     long_description=long_description,
@@ -28,7 +28,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "codebase-digest=codebase_digest.app:main",
+            "cdigest=codebase_digest.app:main",
         ],
     },
     python_requires='>=3.6',
