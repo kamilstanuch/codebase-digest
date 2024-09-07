@@ -43,6 +43,13 @@ def github_login():
         print(f"GitHub login failed: {str(e)}")
         sys.exit(1)
 
+def ensure_github_remote():
+    remotes = run_command('git remote -v')
+    if 'origin' not in remotes:
+        repo_url = input("Enter the GitHub repository URL: ")
+        run_command(f'git remote add origin {repo_url}')
+    print("GitHub remote 'origin' is set up.")
+
 def main():
     # Ensure we're in a git repository
     if not os.path.exists('.git'):
@@ -51,6 +58,9 @@ def main():
 
     # Login to GitHub
     github = github_login()
+
+    # Ensure GitHub remote is set up
+    ensure_github_remote()
 
     # Update version
     new_version = update_version()
