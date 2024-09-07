@@ -11,7 +11,7 @@ setup(
     description="Consolidates and analyzes codebases for insights.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/kamilstanuch/CodebaseConsolidator",
+    url="https://github.com/kamilstanuch/codebaseconsolidator",
     packages=find_packages(exclude=["tests*"]),
     classifiers=[
         "Development Status :: 3 - Alpha",

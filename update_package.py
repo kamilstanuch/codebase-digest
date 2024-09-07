@@ -43,12 +43,63 @@ def github_login():
         print(f"GitHub login failed: {str(e)}")
         sys.exit(1)
 
-def ensure_github_remote():
+def ensure_github_remote(github):
     remotes = run_command('git remote -v')
+    repo_name = None
     if 'origin' not in remotes:
-        repo_url = input("Enter the GitHub repository URL: ")
+        repo_name = input("Enter the GitHub repository name: ")
+        user = github.get_user()
+        repo_url = f"https://github.com/{user.login}/{repo_name}.git"
         run_command(f'git remote add origin {repo_url}')
-    print("GitHub remote 'origin' is set up.")
+    else:
+        print("Checking if the remote repository exists...")
+        try:
+            remote_url = run_command('git remote get-url origin')
+            repo_name = remote_url.split('/')[-1].replace('.git', '')
+            run_command('git ls-remote --exit-code --heads origin main')
+        except SystemExit:
+            print("The remote repository doesn't exist or you don't have access to it.")
+            create_repo = input("Do you want to create a new repository on GitHub? (y/n): ")
+            if create_repo.lower() == 'y':
+                repo_name = input("Enter the repository name: ")
+                user = github.get_user()
+                user.create_repo(repo_name)
+                new_repo_url = f"https://github.com/{user.login}/{repo_name}.git"
+                run_command(f'git remote set-url origin {new_repo_url}')
+                print(f"Created new repository: {new_repo_url}")
+            else:
+                sys.exit(1)
+    
+    if repo_name is None:
+        repo_name = input("Could not determine repository name. Please enter it manually: ")
+    
+    print(f"GitHub remote 'origin' is set up for repository: {repo_name}")
+    return repo_name
+
+def sync_with_remote():
+    print("Syncing with remote repository...")
+    try:
+        run_command('git fetch origin')
+        run_command('git merge origin/main --allow-unrelated-histories --no-edit')
+    except SystemExit:
+        print("There might be merge conflicts. Please resolve them manually and run the script again.")
+        print("You can try the following steps:")
+        print("1. git pull origin main --allow-unrelated-histories")
+        print("2. Resolve any conflicts manually")
+        print("3. git add .")
+        print("4. git commit -m 'Merge remote changes'")
+        print("After resolving conflicts, run this script again.")
+        sys.exit(1)
+
+def push_to_remote():
+    print("Pushing to GitHub...")
+    try:
+        run_command('git push -u origin main')
+    except SystemExit:
+        print("Push failed. Attempting to pull changes first...")
+        sync_with_remote()
+        print("Trying to push again...")
+        run_command('git push -u origin main')
 
 def main():
     # Ensure we're in a git repository
@@ -59,8 +110,11 @@ def main():
     # Login to GitHub
     github = github_login()
 
-    # Ensure GitHub remote is set up
-    ensure_github_remote()
+    # Ensure GitHub remote is set up and get repo name
+    repo_name = ensure_github_remote(github)
+
+    # Sync with remote before making changes
+    sync_with_remote()
 
     # Update version
     new_version = update_version()
@@ -73,11 +127,11 @@ def main():
     run_command(f'git commit -m "Update to version {new_version}: {change_description}"')
 
     # Push to GitHub
-    print("Pushing to GitHub...")
-    run_command('git push origin main')
+    push_to_remote()
 
     # Create GitHub release
-    repo = github.get_user().get_repo('codeconsolidator')
+    user = github.get_user()
+    repo = user.get_repo(repo_name)
     repo.create_git_release(f"v{new_version}", f"Version {new_version}", change_description)
 
     # Build and upload to PyPI
