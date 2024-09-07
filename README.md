@@ -48,6 +48,7 @@ path_to_directory: Path to the directory you want to analyze.
 --no-content: Exclude file contents from the output.
 --include-git: Include .git directory in the analysis.
 --max-size: Maximum allowed text content size in KB (default: 10240 KB).
+--copy-to-clipboard: Copy the output to clipboard.
 ```
 
 ```bash
