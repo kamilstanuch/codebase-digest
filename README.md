@@ -1,6 +1,6 @@
-# CodeConsolidator
+# Codebase Digest
 
-CodeConsolidator is a command-line tool written in Python that helps you analyze and understand your codebase. It provides a structured overview of your project's directory structure, file sizes, token counts, and even consolidates the content of all text-based files into a single output for easy analysis with Large Language Models (LLMs).
+Codebase Digest is a command-line tool written in Python that helps you analyze and understand your codebase. It provides a structured overview of your project's directory structure, file sizes, token counts, and even consolidates the content of all text-based files into a single output for easy analysis with Large Language Models (LLMs).
 
 ## Features
 
@@ -9,19 +9,33 @@ CodeConsolidator is a command-line tool written in Python that helps you analyze
 * **File Content Consolidation:** Consolidates the content of all text-based files into a single output file (useful for LLM analysis).
 * **.gitignore Support:** Respects your .gitignore file to exclude unwanted files and directories from the analysis.
 * **Customizable Output:** Choose between text or JSON output formats and customize the level of detail included.
-* **Colored Console Output:** Provides a visually appealing and informative summary in the console.
+* **Colored Console Output:** Provides a visually appealing and informative summary in the console..
 
 ## Installation
 
-```bash
-pip install tiktoken colorama
-```
+### Option 1: Install via pip (Recommended)
 
 ```bash
-python codeconsolidator.py [path_to_directory] [options]
+pip install codebase-digest
+```
+
+
+### Option 2: Clone the repository
+
+```bash
+git clone https://github.com/kamilstanuch/codebase-digest.git
+cd codebase-digest
+pip install -r requirements.txt
+```
+
+## Usage
+
+```bash
+python codebase-digest [path_to_directory] [options]
 ```
 
 ## Options
+
 ```bash
 path_to_directory: Path to the directory you want to analyze.
 -d, --max-depth: Maximum depth for directory traversal.
@@ -37,7 +51,7 @@ path_to_directory: Path to the directory you want to analyze.
 ```
 
 ```bash
-python codeconsolidator.py my_project -d 3 -o json --show-size --ignore-ext .pyc .log
+python codebase-digest.py my_project -d 3 -o json --show-size --ignore-ext .pyc .log
 ```
 
 # 10 LLM Prompts for Enhanced Codebase Analysis 

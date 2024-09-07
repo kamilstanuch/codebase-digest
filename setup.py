@@ -4,13 +4,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="codeconsolidator",
-    version='0.1.8',
+    name="codebase-digest",
+    version='0.1.9',
     author="Kamil Stanuch",
     description="Consolidates and analyzes codebases for insights.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/kamilstanuch/codeconsolidator",
+    url="https://github.com/kamilstanuch/codebase-digest",
     packages=find_packages(exclude=["tests*"]),
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -28,7 +28,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "codeconsolidator=codeconsolidator.app:main",
+            "codebase-digest=codebase_digest.app:main",
         ],
     },
     python_requires='>=3.6',
