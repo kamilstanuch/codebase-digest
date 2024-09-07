@@ -7,11 +7,10 @@ setup(
     name="codeconsolidator",
     version='0.1.4',
     author="Kamil Stanuch",
-    author_email="your.email@example.com",
     description="Consolidates and analyzes codebases for insights.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/kamilstanuch/codebaseconsolidator",
+    url="https://github.com/kamilstanuch/codeconsolidator",
     packages=find_packages(exclude=["tests*"]),
     classifiers=[
         "Development Status :: 3 - Alpha",

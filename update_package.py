@@ -3,7 +3,7 @@ import subprocess
 import sys
 from github import Github
 from getpass import getpass
-from github.GithubException import GithubException  # Add this import
+from github.GithubException import GithubException
 import keyring
 from twine.commands.upload import upload
 from twine.settings import Settings
@@ -13,7 +13,7 @@ def run_command(command):
     output, error = process.communicate()
     if process.returncode != 0:
         print(f"Error: {error.decode('utf-8')}")
-        sys.exit(1)
+        return False
     return output.decode('utf-8').strip()
 
 def update_version():
@@ -33,35 +33,47 @@ def update_version():
     
     return new_version
 
-def github_login():
-    token = os.environ.get('GITHUB_TOKEN')
-    if not token:
-        token = getpass("Enter your GitHub personal access token: ")
-    
-    try:
-        g = Github(token)
-        user = g.get_user()
-        print(f"Logged in as: {user.login}")
-        return g
-    except Exception as e:
-        print(f"GitHub login failed: {str(e)}")
-        sys.exit(1)
+def github_login(max_attempts=3):
+    for attempt in range(max_attempts):
+        token = os.environ.get('GITHUB_TOKEN') or getpass("Enter your GitHub personal access token: ")
+        try:
+            g = Github(token)
+            user = g.get_user()
+            print(f"Logged in as: {user.login}")
+            return g
+        except Exception as e:
+            print(f"GitHub login failed: {str(e)}")
+            if attempt < max_attempts - 1:
+                print("Please try again.")
+            else:
+                print("Max attempts reached. Exiting.")
+                sys.exit(1)
 
 def ensure_github_remote(github):
     remotes = run_command('git remote -v')
+    if remotes is False:
+        print("Failed to get git remotes. Please check your git installation.")
+        sys.exit(1)
+    
     repo_name = None
     if 'origin' not in remotes:
         repo_name = input("Enter the GitHub repository name: ")
         user = github.get_user()
         repo_url = f"https://github.com/{user.login}/{repo_name}.git"
-        run_command(f'git remote add origin {repo_url}')
+        if run_command(f'git remote add origin {repo_url}') is False:
+            print("Failed to add remote. Please check your git configuration.")
+            sys.exit(1)
     else:
         print("Checking if the remote repository exists...")
         try:
             remote_url = run_command('git remote get-url origin')
+            if remote_url is False:
+                raise Exception("Failed to get remote URL")
             repo_name = remote_url.split('/')[-1].replace('.git', '')
-            run_command('git ls-remote --exit-code --heads origin main')
-        except SystemExit:
+            if run_command('git ls-remote --exit-code --heads origin main') is False:
+                raise Exception("Failed to check remote repository")
+        except Exception as e:
+            print(f"Error: {str(e)}")
             print("The remote repository doesn't exist or you don't have access to it.")
             create_repo = input("Do you want to create a new repository on GitHub? (y/n): ")
             if create_repo.lower() == 'y':
@@ -69,7 +81,9 @@ def ensure_github_remote(github):
                 user = github.get_user()
                 user.create_repo(repo_name)
                 new_repo_url = f"https://github.com/{user.login}/{repo_name}.git"
-                run_command(f'git remote set-url origin {new_repo_url}')
+                if run_command(f'git remote set-url origin {new_repo_url}') is False:
+                    print("Failed to set remote URL. Please check your git configuration.")
+                    sys.exit(1)
                 print(f"Created new repository: {new_repo_url}")
             else:
                 sys.exit(1)
@@ -82,10 +96,7 @@ def ensure_github_remote(github):
 
 def sync_with_remote():
     print("Syncing with remote repository...")
-    try:
-        run_command('git fetch origin')
-        run_command('git merge origin/main --allow-unrelated-histories --no-edit')
-    except SystemExit:
+    if run_command('git fetch origin') is False or run_command('git merge origin/main --allow-unrelated-histories --no-edit') is False:
         print("There might be merge conflicts. Please resolve them manually and run the script again.")
         print("You can try the following steps:")
         print("1. git pull origin main --allow-unrelated-histories")
@@ -97,83 +108,67 @@ def sync_with_remote():
 
 def push_to_remote():
     print("Pushing to GitHub...")
-    try:
-        run_command('git push -u origin main')
-    except SystemExit:
+    if run_command('git push -u origin main') is False:
         print("Push failed. Attempting to pull changes first...")
         sync_with_remote()
         print("Trying to push again...")
-        run_command('git push -u origin main')
+        if run_command('git push -u origin main') is False:
+            print("Push failed again. Please check your repository and try manually.")
+            sys.exit(1)
 
-def upload_to_pypi(dist_files):
-    username = os.environ.get('PYPI_USERNAME') or input("Enter your PyPI username: ")
-    password = os.environ.get('PYPI_PASSWORD') or keyring.get_password("pypi", username) or getpass("Enter your PyPI password: ")
+def upload_to_pypi(dist_files, max_attempts=3):
+    for attempt in range(max_attempts):
+        username = os.environ.get('PYPI_USERNAME') or input("Enter your PyPI username: ")
+        password = os.environ.get('PYPI_PASSWORD') or keyring.get_password("pypi", username) or getpass("Enter your PyPI token: ")
 
-    settings = Settings(
-        username=username,
-        password=password,
-        repository_url='https://upload.pypi.org/legacy/'
-    )
+        settings = Settings(
+            username="__token__",
+            password=password,
+            repository_url='https://upload.pypi.org/legacy/'
+        )
 
-    try:
-        upload(settings, dist_files)
-        print("Successfully uploaded to PyPI")
-    except Exception as e:
-        print(f"Failed to upload to PyPI: {str(e)}")
-        print("Please ensure your PyPI credentials are correct and you have the necessary permissions.")
+        try:
+            upload(settings, dist_files)
+            print("Successfully uploaded to PyPI")
+            return
+        except Exception as e:
+            print(f"Failed to upload to PyPI: {str(e)}")
+            if attempt < max_attempts - 1:
+                print("Please try again.")
+            else:
+                print("Max attempts reached. Please check your PyPI credentials and try manually.")
+                sys.exit(1)
 
 def main():
-    # Ensure we're in a git repository
     if not os.path.exists('.git'):
         print("Error: Not in a git repository. Please run this script from your project's root directory.")
         sys.exit(1)
 
-    # Login to GitHub
     github = github_login()
-
-    # Ensure GitHub remote is set up and get repo name
     repo_name = ensure_github_remote(github)
-
-    # Sync with remote before making changes
     sync_with_remote()
-
-    # Update version
     new_version = update_version()
-
-    # Get change description
     change_description = input("Enter a brief description of the changes: ")
 
-    # Commit changes
-    run_command('git add .')
-    run_command(f'git commit -m "Update to version {new_version}: {change_description}"')
+    if run_command('git add .') is False or run_command(f'git commit -m "Update to version {new_version}: {change_description}"') is False:
+        print("Failed to commit changes. Please check your git configuration.")
+        sys.exit(1)
 
-    # Push to GitHub
     push_to_remote()
 
-    # Create GitHub release
     user = github.get_user()
     repo = user.get_repo(repo_name)
     try:
         repo.create_git_release(f"v{new_version}", f"Version {new_version}", change_description)
         print(f"GitHub release created for version {new_version}")
     except GithubException as e:
-        if e.status == 403:
-            print("Error: Unable to create GitHub release. Your personal access token may not have sufficient permissions.")
-            print("Please update your token to include the 'repo' scope:")
-            print("1. Go to https://github.com/settings/tokens")
-            print("2. Generate a new token or edit the existing one")
-            print("3. Ensure the 'repo' scope is selected")
-            print("4. Update the token in this script or set it as an environment variable")
-        else:
-            print(f"An error occurred while creating the GitHub release: {str(e)}")
-        print("Continuing with PyPI upload...")
-    except Exception as e:
-        print(f"An unexpected error occurred while creating the GitHub release: {str(e)}")
-        print("Continuing with PyPI upload...")
+        print(f"An error occurred while creating the GitHub release: {str(e)}")
+        print("Please create the release manually on the GitHub website.")
 
-    # Build and upload to PyPI
     print("Building distribution...")
-    run_command('python setup.py sdist bdist_wheel')
+    if run_command('python setup.py sdist bdist_wheel') is False:
+        print("Failed to build distribution. Please check your setup.py and try manually.")
+        sys.exit(1)
 
     print("Uploading to PyPI...")
     dist_files = [f for f in os.listdir('dist') if f.endswith(('.whl', '.tar.gz'))]
@@ -181,7 +176,6 @@ def main():
     upload_to_pypi(dist_files)
 
     print(f"Package updated to version {new_version} and pushed to GitHub")
-    print("Note: If the GitHub release creation failed, please create it manually on the GitHub website.")
 
 if __name__ == "__main__":
     main()
