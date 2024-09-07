@@ -132,7 +132,20 @@ def main():
     # Create GitHub release
     user = github.get_user()
     repo = user.get_repo(repo_name)
-    repo.create_git_release(f"v{new_version}", f"Version {new_version}", change_description)
+    try:
+        repo.create_git_release(f"v{new_version}", f"Version {new_version}", change_description)
+        print(f"GitHub release created for version {new_version}")
+    except github.GithubException as e:
+        if e.status == 403:
+            print("Error: Unable to create GitHub release. Your personal access token may not have sufficient permissions.")
+            print("Please update your token to include the 'repo' scope:")
+            print("1. Go to https://github.com/settings/tokens")
+            print("2. Generate a new token or edit the existing one")
+            print("3. Ensure the 'repo' scope is selected")
+            print("4. Update the token in this script or set it as an environment variable")
+        else:
+            print(f"An error occurred while creating the GitHub release: {str(e)}")
+        print("Continuing with PyPI upload...")
 
     # Build and upload to PyPI
     print("Building distribution...")
@@ -141,7 +154,8 @@ def main():
     print("Uploading to PyPI...")
     run_command('python -m twine upload dist/*')
 
-    print(f"Package updated to version {new_version} and pushed to GitHub and PyPI")
+    print(f"Package updated to version {new_version} and pushed to GitHub")
+    print("Note: If the GitHub release creation failed, please create it manually on the GitHub website.")
 
 if __name__ == "__main__":
     main()
