@@ -1,0 +1,4 @@
+tiktoken
+colorama
+PyGithub
+pyperclip

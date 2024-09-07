@@ -9,6 +9,7 @@ import mimetypes
 import tiktoken
 from colorama import init, Fore, Back, Style
 import sys
+import pyperclip
 
 # Initialize colorama for colorful console output.
 init()
@@ -198,6 +199,7 @@ def main():
     parser.add_argument("--no-content", action="store_true", help="Exclude file contents from the output")
     parser.add_argument("--include-git", action="store_true", help="Include .git directory in the analysis")
     parser.add_argument("--max-size", type=int, default=10240, help="Maximum allowed text content size in KB (default: 10240 KB)")
+    parser.add_argument("--copy-to-clipboard", action="store_true", help="Copy the output to clipboard")
     
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -213,7 +215,7 @@ def main():
     ignore_patterns = load_gitignore(args.path)
     ignore_extensions = set(ext.lower() if ext.startswith('.') else f'.{ext.lower()}' for ext in args.ignore_ext)
 
-    print_frame("Codebase Analyzer")
+    print_frame("Codebase Digest")
     print(Fore.CYAN + "Analyzing directory: " + Fore.WHITE + args.path + Style.RESET_ALL)
 
     data = analyze_directory(args.path, ignore_patterns, ignore_extensions, include_git=args.include_git, max_depth=args.max_depth)
@@ -227,7 +229,7 @@ def main():
 
     if args.output == "json":
         output = json.dumps(data, indent=2)
-        file_name = args.file or "codebase_analysis.json"
+        file_name = args.file or f"{os.path.basename(args.path)}_codebase_digest.json"
     else:
         output = f"Codebase Analysis for: {args.path}\n"
         # Always include the tree in the .txt output
@@ -236,11 +238,28 @@ def main():
         output += generate_summary_string(data, use_color=False)
         if not args.no_content:
             output += generate_content_string(data)
-        file_name = args.file or "codebase_analysis.txt"
+        file_name = args.file or f"{os.path.basename(args.path)}_codebase_digest.txt"
 
-    with open(file_name, 'w', encoding='utf-8') as f:
+    full_path = os.path.abspath(file_name)
+    with open(full_path, 'w', encoding='utf-8') as f:
         f.write(output)
-    print(Fore.GREEN + f"\nAnalysis saved to {file_name}" + Style.RESET_ALL)
+    print(Fore.GREEN + f"\nAnalysis saved to: {full_path}" + Style.RESET_ALL)
+
+    # New code for clipboard functionality
+    if args.copy_to_clipboard:
+        try:
+            pyperclip.copy(output)
+            print(Fore.GREEN + "Output copied to clipboard!" + Style.RESET_ALL)
+        except Exception as e:
+            print(Fore.RED + f"Failed to copy to clipboard: {str(e)}" + Style.RESET_ALL)
+    elif not args.copy_to_clipboard and args.output == "text":
+        copy_to_clipboard = input("Do you want to copy the output to clipboard? (y/n): ").lower().strip()
+        if copy_to_clipboard == 'y':
+            try:
+                pyperclip.copy(output)
+                print(Fore.GREEN + "Output copied to clipboard!" + Style.RESET_ALL)
+            except Exception as e:
+                print(Fore.RED + f"Failed to copy to clipboard: {str(e)}" + Style.RESET_ALL)
 
     # Print colored summary to console
     print_frame("Analysis Summary")

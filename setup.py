@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="codebase-digest",
-    version='0.1.14',
+    version='0.1.18',
     author="Kamil Stanuch",
     description="Consolidates and analyzes codebases for insights.",
     long_description=long_description,
@@ -25,6 +25,7 @@ setup(
         "tiktoken",
         "colorama",
         "PyGithub",
+        "pyperclip",
     ],
     entry_points={
         "console_scripts": [
