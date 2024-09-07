@@ -1,12 +1,14 @@
 import os
 import subprocess
 import sys
+import re
 from github import Github
 from getpass import getpass
 from github.GithubException import GithubException
 import keyring
 from twine.commands.upload import upload
 from twine.settings import Settings
+from packaging import version
 
 def run_command(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -24,7 +26,16 @@ def update_version():
         if line.strip().startswith('version='):
             current_version = line.split('=')[1].strip().strip("'").strip('"')
             print(f"Current version: {current_version}")
-            new_version = input("Enter new version number: ")
+            while True:
+                new_version = input("Enter new version number (e.g., 0.1.7): ")
+                if re.match(r'^\d+(\.\d+){0,2}(\.?[a-zA-Z0-9]+)?$', new_version):
+                    try:
+                        version.parse(new_version)
+                        break
+                    except version.InvalidVersion:
+                        print("Invalid version format. Please use a valid version number.")
+                else:
+                    print("Invalid version format. Please use a valid version number.")
             content[i] = f"    version='{new_version}',\n"
             break
     

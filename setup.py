@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="codeconsolidator",
-    version='0.1.7 setup.py and update_package.py updated',
+    version='0.1.8',
     author="Kamil Stanuch",
     description="Consolidates and analyzes codebases for insights.",
     long_description=long_description,
