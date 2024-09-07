@@ -18,13 +18,13 @@ def run_command(command):
         return False
     return output.decode('utf-8').strip()
 
-def get_or_set_credential(service, username, prompt):
-    credential = keyring.get_password(service, username)
+def get_or_set_credential(service, credential_type, prompt):
+    credential = keyring.get_password(service, credential_type)
     if not credential:
-        credential = getpass(prompt)
-        save = input(f"Do you want to save the {service} token? (y/n): ").lower().strip() == 'y'
+        credential = input(prompt) if credential_type == 'username' else getpass(prompt)
+        save = input(f"Do you want to save the {service} {credential_type}? (y/n): ").lower().strip() == 'y'
         if save:
-            keyring.set_password(service, username, credential)
+            keyring.set_password(service, credential_type, credential)
     return credential
 
 def github_login(max_attempts=3):
@@ -77,12 +77,13 @@ def push_to_remote():
     print("Pushing to GitHub...")
     if run_command('git push -u origin main') is False:
         print("Push failed. Please check your repository and try manually.")
-        sys.exit(1)
+        return False
+    return True
 
 def upload_to_pypi(dist_files, max_attempts=3):
     for attempt in range(max_attempts):
-        username = os.environ.get('PYPI_USERNAME') or input("Enter your PyPI username: ")
-        password = os.environ.get('PYPI_PASSWORD') or get_or_set_credential("pypi", username, "Enter your PyPI token: ")
+        username = os.environ.get('PYPI_USERNAME') or get_or_set_credential("pypi", "username", "Enter your PyPI username: ")
+        password = os.environ.get('PYPI_PASSWORD') or get_or_set_credential("pypi", "token", "Enter your PyPI token: ")
 
         settings = Settings(
             username=username,
@@ -93,15 +94,16 @@ def upload_to_pypi(dist_files, max_attempts=3):
         try:
             upload(settings, dist_files)
             print("Successfully uploaded to PyPI")
-            return
+            return True
         except Exception as e:
             print(f"Failed to upload to PyPI: {str(e)}")
-            keyring.delete_password("pypi", username)
+            keyring.delete_password("pypi", "username")
+            keyring.delete_password("pypi", "token")
             if attempt < max_attempts - 1:
                 print("Please try again.")
             else:
                 print("Max attempts reached. Please check your PyPI credentials and try manually.")
-                sys.exit(1)
+                return False
 
 def update_version():
     with open('setup.py', 'r') as f:
@@ -144,7 +146,9 @@ def main():
         print("Failed to commit changes. Please check your git configuration.")
         sys.exit(1)
 
-    push_to_remote()
+    if push_to_remote() is False:
+        print("Failed to push to GitHub. Aborting.")
+        sys.exit(1)
 
     user = github.get_user()
     repo = user.get_repo(repo_name)
@@ -154,6 +158,7 @@ def main():
     except GithubException as e:
         print(f"An error occurred while creating the GitHub release: {str(e)}")
         print("Please create the release manually on the GitHub website.")
+        sys.exit(1)
 
     print("Cleaning old distribution files...")
     if os.path.exists('dist'):
@@ -168,9 +173,24 @@ def main():
     print("Uploading to PyPI...")
     dist_files = [f for f in os.listdir('dist') if f.endswith(('.whl', '.tar.gz'))]
     dist_files = [os.path.join('dist', f) for f in dist_files]
-    upload_to_pypi(dist_files)
+    if upload_to_pypi(dist_files):
+        print(f"Package updated to version {new_version} and pushed to GitHub and PyPI")
+        # Update setup.py with the new version
+        update_setup_py_version(new_version)
+    else:
+        print("Failed to upload to PyPI. Version in setup.py not updated.")
+        sys.exit(1)
 
-    print(f"Package updated to version {new_version} and pushed to GitHub")
+def update_setup_py_version(new_version):
+    with open('setup.py', 'r') as f:
+        content = f.read()
+    
+    updated_content = re.sub(r"version='[\d.]+'", f"version='{new_version}'", content)
+    
+    with open('setup.py', 'w') as f:
+        f.write(updated_content)
+    
+    print(f"Updated setup.py with new version: {new_version}")
 
 if __name__ == "__main__":
     main()
