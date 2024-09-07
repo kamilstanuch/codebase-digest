@@ -55,7 +55,6 @@ def ensure_github_remote(github):
         print("Failed to get git remotes. Please check your git installation.")
         sys.exit(1)
     
-    repo_name = None
     if 'origin' not in remotes:
         repo_name = input("Enter the GitHub repository name: ")
         user = github.get_user()
@@ -63,34 +62,13 @@ def ensure_github_remote(github):
         if run_command(f'git remote add origin {repo_url}') is False:
             print("Failed to add remote. Please check your git configuration.")
             sys.exit(1)
-    else:
-        print("Checking if the remote repository exists...")
-        try:
-            remote_url = run_command('git remote get-url origin')
-            if remote_url is False:
-                raise Exception("Failed to get remote URL")
-            repo_name = remote_url.split('/')[-1].replace('.git', '')
-            if run_command('git ls-remote --exit-code --heads origin main') is False:
-                raise Exception("Failed to check remote repository")
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            print("The remote repository doesn't exist or you don't have access to it.")
-            create_repo = input("Do you want to create a new repository on GitHub? (y/n): ")
-            if create_repo.lower() == 'y':
-                repo_name = input("Enter the repository name: ")
-                user = github.get_user()
-                user.create_repo(repo_name)
-                new_repo_url = f"https://github.com/{user.login}/{repo_name}.git"
-                if run_command(f'git remote set-url origin {new_repo_url}') is False:
-                    print("Failed to set remote URL. Please check your git configuration.")
-                    sys.exit(1)
-                print(f"Created new repository: {new_repo_url}")
-            else:
-                sys.exit(1)
     
-    if repo_name is None:
-        repo_name = input("Could not determine repository name. Please enter it manually: ")
+    remote_url = run_command('git remote get-url origin')
+    if remote_url is False:
+        print("Failed to get remote URL. Please check your git configuration.")
+        sys.exit(1)
     
+    repo_name = remote_url.split('/')[-1].replace('.git', '')
     print(f"GitHub remote 'origin' is set up for repository: {repo_name}")
     return repo_name
 
@@ -98,23 +76,13 @@ def sync_with_remote():
     print("Syncing with remote repository...")
     if run_command('git fetch origin') is False or run_command('git merge origin/main --allow-unrelated-histories --no-edit') is False:
         print("There might be merge conflicts. Please resolve them manually and run the script again.")
-        print("You can try the following steps:")
-        print("1. git pull origin main --allow-unrelated-histories")
-        print("2. Resolve any conflicts manually")
-        print("3. git add .")
-        print("4. git commit -m 'Merge remote changes'")
-        print("After resolving conflicts, run this script again.")
         sys.exit(1)
 
 def push_to_remote():
     print("Pushing to GitHub...")
     if run_command('git push -u origin main') is False:
-        print("Push failed. Attempting to pull changes first...")
-        sync_with_remote()
-        print("Trying to push again...")
-        if run_command('git push -u origin main') is False:
-            print("Push failed again. Please check your repository and try manually.")
-            sys.exit(1)
+        print("Push failed. Please check your repository and try manually.")
+        sys.exit(1)
 
 def upload_to_pypi(dist_files, max_attempts=3):
     for attempt in range(max_attempts):
