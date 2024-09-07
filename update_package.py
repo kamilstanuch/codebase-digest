@@ -18,42 +18,26 @@ def run_command(command):
         return False
     return output.decode('utf-8').strip()
 
-def update_version():
-    with open('setup.py', 'r') as f:
-        content = f.readlines()
-    
-    for i, line in enumerate(content):
-        if line.strip().startswith('version='):
-            current_version = line.split('=')[1].strip().strip("'").strip('"')
-            print(f"Current version: {current_version}")
-            while True:
-                new_version = input("Enter new version number (e.g., 0.1.7): ")
-                if re.match(r'^\d+(\.\d+){0,2}(\.?[a-zA-Z0-9]+)?$', new_version):
-                    try:
-                        version.parse(new_version)
-                        break
-                    except version.InvalidVersion:
-                        print("Invalid version format. Please use a valid version number.")
-                else:
-                    print("Invalid version format. Please use a valid version number.")
-            content[i] = f"    version='{new_version}',\n"
-            break
-    
-    with open('setup.py', 'w') as f:
-        f.writelines(content)
-    
-    return new_version
+def get_or_set_credential(service, username, prompt):
+    credential = keyring.get_password(service, username)
+    if not credential:
+        credential = getpass(prompt)
+        save = input(f"Do you want to save the {service} token? (y/n): ").lower().strip() == 'y'
+        if save:
+            keyring.set_password(service, username, credential)
+    return credential
 
 def github_login(max_attempts=3):
     for attempt in range(max_attempts):
-        token = os.environ.get('GITHUB_TOKEN') or getpass("Enter your GitHub personal access token: ")
+        token = os.environ.get('GITHUB_TOKEN') or get_or_set_credential("github", "token", "Enter your GitHub personal access token: ")
         try:
             g = Github(token)
             user = g.get_user()
             print(f"Logged in as: {user.login}")
             return g
-        except Exception as e:
-            print(f"GitHub login failed: {str(e)}")
+        except GithubException:
+            print("GitHub login failed. Token might be expired or invalid.")
+            keyring.delete_password("github", "token")
             if attempt < max_attempts - 1:
                 print("Please try again.")
             else:
@@ -98,10 +82,10 @@ def push_to_remote():
 def upload_to_pypi(dist_files, max_attempts=3):
     for attempt in range(max_attempts):
         username = os.environ.get('PYPI_USERNAME') or input("Enter your PyPI username: ")
-        password = os.environ.get('PYPI_PASSWORD') or keyring.get_password("pypi", username) or getpass("Enter your PyPI token: ")
+        password = os.environ.get('PYPI_PASSWORD') or get_or_set_credential("pypi", username, "Enter your PyPI token: ")
 
         settings = Settings(
-            username="__token__",
+            username=username,
             password=password,
             repository_url='https://upload.pypi.org/legacy/'
         )
@@ -112,11 +96,38 @@ def upload_to_pypi(dist_files, max_attempts=3):
             return
         except Exception as e:
             print(f"Failed to upload to PyPI: {str(e)}")
+            keyring.delete_password("pypi", username)
             if attempt < max_attempts - 1:
                 print("Please try again.")
             else:
                 print("Max attempts reached. Please check your PyPI credentials and try manually.")
                 sys.exit(1)
+
+def update_version():
+    with open('setup.py', 'r') as f:
+        content = f.readlines()
+    
+    for i, line in enumerate(content):
+        if line.strip().startswith('version='):
+            current_version = line.split('=')[1].strip().strip("'").strip('"')
+            print(f"Current version: {current_version}")
+            while True:
+                new_version = input("Enter new version number (e.g., 0.1.7): ")
+                if re.match(r'^\d+(\.\d+){0,2}(\.?[a-zA-Z0-9]+)?$', new_version):
+                    try:
+                        version.parse(new_version)
+                        break
+                    except version.InvalidVersion:
+                        print("Invalid version format. Please use a valid version number.")
+                else:
+                    print("Invalid version format. Please use a valid version number.")
+            content[i] = f"    version='{new_version}',\n"
+            break
+    
+    with open('setup.py', 'w') as f:
+        f.writelines(content)
+    
+    return new_version
 
 def main():
     if not os.path.exists('.git'):
