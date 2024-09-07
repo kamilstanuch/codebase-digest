@@ -5,13 +5,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="codeconsolidator",
-    version='0.1.4',  # This will be automatically updated by the script
+    version='0.1.4',
     author="Kamil Stanuch",
+    author_email="your.email@example.com",
     description="Consolidates and analyzes codebases for insights.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/kamilstanuch/CodebaseConsolidator",
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests*"]),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -24,6 +25,7 @@ setup(
     install_requires=[
         "tiktoken",
         "colorama",
+        "PyGithub",
     ],
     entry_points={
         "console_scripts": [
