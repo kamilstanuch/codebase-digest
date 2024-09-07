@@ -192,7 +192,6 @@ def main():
     parser.add_argument("-d", "--max-depth", type=int, help="Maximum depth for directory traversal")
     parser.add_argument("-o", "--output", choices=["text", "json"], default="text", help="Output format")
     parser.add_argument("-f", "--file", help="Output file name (default: codebase_analysis.txt or codebase_analysis.json)")
-    parser.add_argument("--show-tree", action="store_true", help="Show directory tree in console output (always included in text file output)")
     parser.add_argument("--show-size", action="store_true", help="Show file sizes in directory tree")
     parser.add_argument("--show-ignored", action="store_true", help="Show ignored files and directories in tree")
     parser.add_argument("--ignore-ext", nargs="+", default=[], help="Additional file extensions to ignore")
@@ -222,8 +221,8 @@ def main():
 
     # Print colored summary to console immediately
     print_frame("Analysis Summary")
-    if args.show_tree:
-        print(generate_tree_string(data, show_size=args.show_size, show_ignored=args.show_ignored, use_color=True))
+    # Always print the tree, regardless of the --show-tree argument
+    print(generate_tree_string(data, show_size=args.show_size, show_ignored=args.show_ignored, use_color=True))
     print(generate_summary_string(data, use_color=True))
 
     if data['text_content_size'] / 1024 > args.max_size:

@@ -72,71 +72,45 @@ You can use these prompts with various LLM interfaces:
 4. **Code Quality Enhancement**: Identify areas for improvement in code quality, readability, and maintainability.
 5. **Documentation Generation**: Automatically generate or improve codebase documentation.
 6. **Learning Tool**: Use as a teaching aid to explain complex coding concepts or architectures.
+7. **Business Alignment**: Analyze how the codebase supports business objectives and identify potential improvements.
+8. **Stakeholder Communication**: Generate insights to facilitate discussions with non-technical stakeholders.
 
 ## Prompt Categories
 
 ### I. Code Quality & Understanding:
-
-- [Codebase Error and Inconsistency Analysis](prompt_library/quality_error_analysis.md)
-- [Codebase Risk Assessment](prompt_library/quality_risk_assessment.md)
-- [Codebase Documentation Generation](prompt_library/quality_documentation_generation.md)
+- [Codebase Error and Inconsistency Analysis](prompt_library/quality_error_analysis.md): Identify and analyze errors and inconsistencies in the codebase.
+- [Codebase Risk Assessment](prompt_library/quality_risk_assessment.md): Evaluate potential risks within the codebase.
+- [Codebase Documentation Generation](prompt_library/quality_documentation_generation.md): Automatically generate or improve codebase documentation.
 
 ### II. Learning & Knowledge Extraction:
-
-- [User Story Reconstruction from Code](prompt_library/learning_user_story_reconstruction.md)
-- [Code-Based Mini-Lesson Generation](prompt_library/learning_mini_lesson_generation.md)
+- [User Story Reconstruction from Code](prompt_library/learning_user_story_reconstruction.md): Reconstruct and structure user stories based on the codebase.
+- [Code-Based Mini-Lesson Generation](prompt_library/learning_mini_lesson_generation.md): Create mini-lessons to explain complex coding concepts or architectures.
 
 ### III. Code Improvement & Transformation:
-
-- [Codebase Best Practice Analysis](prompt_library/improvement_best_practice_analysis.md)
-- [Codebase Translation to Another Programming Language](prompt_library/improvement_language_translation.md)
-- [Codebase Refactoring for Improved Readability and Performance](prompt_library/improvement_refactoring.md)
+- [Codebase Best Practice Analysis](prompt_library/improvement_best_practice_analysis.md): Analyze the codebase for good and bad programming practices.
+- [Codebase Translation to Another Programming Language](prompt_library/improvement_language_translation.md): Translate the codebase from one programming language to another.
+- [Codebase Refactoring for Improved Readability and Performance](prompt_library/improvement_refactoring.md): Suggest refactoring improvements for better readability and performance.
 
 ### IV. Testing & Security:
+- [Unit Test Generation for Codebase](prompt_library/testing_unit_test_generation.md): Generate unit tests for the provided codebase.
+- [Security Vulnerability Analysis of Codebase](prompt_library/security_vulnerability_analysis.md): Identify potential security vulnerabilities in the codebase.
 
-- [Unit Test Generation for Codebase](prompt_library/testing_unit_test_generation.md)
-- [Security Vulnerability Analysis of Codebase](prompt_library/security_vulnerability_analysis.md)
+### V. Business & Stakeholder Analysis:
+- [Business Impact Analysis](prompt_library/business_impact_analysis.md): Identify key features and their potential business impact.
+- [Stakeholder Persona Generation](prompt_library/stakeholder_persona_generation.md): Infer potential stakeholder personas based on codebase functionalities.
+- [Business Model Canvas Analysis](prompt_library/business_model_canvas_analysis.md): Analyze business implications using the Business Model Canvas framework.
+- [Value Proposition Canvas Analysis](prompt_library/value_proposition_canvas_analysis.md): Align technical features with user needs and benefits.
+- [SWOT Analysis](prompt_library/swot_analysis.md): Evaluate the codebase's current state and future potential.
+- [Jobs to be Done (JTBD) Analysis](prompt_library/jobs_to_be_done_analysis.md): Understand core user needs and identify potential improvements.
+- [Lean Canvas Analysis](prompt_library/lean_canvas_analysis.md): Evaluate business potential and identify areas for improvement or pivot.
+- [OKR (Objectives and Key Results) Analysis](prompt_library/okr_analysis.md): Align codebase features with potential business objectives and key results.
+- [Customer Journey Map Analysis](prompt_library/customer_journey_map_analysis.md): Map how different parts support various stages of the user's journey.
+- [Value Chain Analysis](prompt_library/value_chain_analysis.md): Understand how the codebase supports the larger value creation process.
 
 For detailed instructions on how to use these prompts, please refer to the individual files in the `prompt_library` directory.
 
-# Code Analysis Prompt Library
+## Conclusion
 
-This repository contains a collection of prompts designed to assist in various aspects of code analysis, improvement, and documentation.
+This collection of prompts covers a wide range of analysis techniques, from technical code quality assessments to business-oriented evaluations. By using these prompts with Large Language Models, developers and stakeholders can gain valuable insights into their codebase and its alignment with business objectives.
 
-## Available Prompts
-
-1. **User Story Reconstruction** (`learning_user_story_reconstruction.md`)
-   - Reconstruct and structure user stories based on the provided codebase.
-
-2. **Risk Assessment** (`quality_risk_assessment.md`)
-   - Identify potential risks within the codebase.
-
-3. **Best Practice Analysis** (`improvement_best_practice_analysis.md`)
-   - Analyze the codebase for good and bad programming practices.
-
-4. **Language Translation** (`improvement_language_translation.md`)
-   - Translate the codebase from one programming language to another.
-
-5. **Refactoring** (`improvement_refactoring.md`)
-   - Suggest refactoring improvements for better readability and performance.
-
-6. **Unit Test Generation** (`testing_unit_test_generation.md`)
-   - Generate unit tests for the provided codebase.
-
-7. **Business Impact Analysis** (`business_impact_analysis.md`)
-   - Analyze the codebase to identify key features and their potential business impact.
-
-8. **Stakeholder Persona Generation** (`stakeholder_persona_generation.md`)
-   - Infer potential stakeholder personas based on the functionalities present in the codebase.
-
-## Usage
-
-To use these prompts, select the appropriate prompt file for your analysis needs and follow the instructions provided within each prompt.
-
-## Contributing
-
-Contributions to expand and improve this prompt library are welcome. Please submit a pull request with your suggested changes or additions.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+For detailed instructions on how to use each prompt, please refer to the individual files in the `prompt_library` directory.
