@@ -220,6 +220,12 @@ def main():
 
     data = analyze_directory(args.path, ignore_patterns, ignore_extensions, include_git=args.include_git, max_depth=args.max_depth)
 
+    # Print colored summary to console immediately
+    print_frame("Analysis Summary")
+    if args.show_tree:
+        print(generate_tree_string(data, show_size=args.show_size, show_ignored=args.show_ignored, use_color=True))
+    print(generate_summary_string(data, use_color=True))
+
     if data['text_content_size'] / 1024 > args.max_size:
         print(Fore.RED + f"\nWarning: The text content size ({data['text_content_size'] / 1024:.2f} KB) exceeds the maximum allowed size ({args.max_size} KB)." + Style.RESET_ALL)
         proceed = input("Do you want to proceed? (y/n): ").lower().strip()
@@ -260,12 +266,6 @@ def main():
                 print(Fore.GREEN + "Output copied to clipboard!" + Style.RESET_ALL)
             except Exception as e:
                 print(Fore.RED + f"Failed to copy to clipboard: {str(e)}" + Style.RESET_ALL)
-
-    # Print colored summary to console
-    print_frame("Analysis Summary")
-    if args.show_tree:
-        print(generate_tree_string(data, show_size=args.show_size, show_ignored=args.show_ignored, use_color=True))
-    print(generate_summary_string(data, use_color=True))
 
 if __name__ == "__main__":
     main()

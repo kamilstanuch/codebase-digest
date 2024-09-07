@@ -54,186 +54,46 @@ path_to_directory: Path to the directory you want to analyze.
 cdigest my_project -d 3 -o json --show-size --ignore-ext .pyc .log
 ```
 
-# 10 LLM Prompts for Enhanced Codebase Analysis 
+# LLM Prompts for Enhanced Codebase Analysis 
 
-## I. Code Quality & Understanding:
+We've prepared a set of prompts to help you analyze and improve your codebase using Large Language Models. These prompts are stored in the `prompt_library` directory for easy access and management.
 
-### 1. Codebase Error and Inconsistency Analysis
+You can use these prompts with various LLM interfaces:
+- Directly in the [Cursor.sh IDE](https://cursor.sh/) for an integrated development experience.
+- With [Gemini models](https://deepmind.google/technologies/gemini/) for larger codebases (up to 2,097,152 tokens).
+- In any other LLM interface of your choice.
 
-```bash
-**Objective:** Identify potential errors and inconsistencies within the provided codebase.
+## Use Cases
 
-**Instructions:**
+1. **Codebase Mapping and Learning**: Quickly understand the structure and functionality of a new or complex codebase.
+2. **Improving User Stories**: Analyze existing code to refine or generate user stories, ensuring better alignment between code and business requirements.
+3. **Initial Security Analysis**: Perform a preliminary security assessment to identify potential vulnerabilities.
+4. **Code Quality Enhancement**: Identify areas for improvement in code quality, readability, and maintainability.
+5. **Documentation Generation**: Automatically generate or improve codebase documentation.
+6. **Learning Tool**: Use as a teaching aid to explain complex coding concepts or architectures.
 
-1. **Analyze the attached code** for the following:
-    * Syntax errors and logical flaws.
-    * Inconsistencies in variable and function naming conventions.
-    * Code duplication.
-    * Performance bottlenecks.
-    * Violations of established coding best practices. 
-2. **Structure your analysis clearly**, pinpointing specific code snippets and providing detailed descriptions of the identified issues.
-3. **Prioritize clarity and conciseness** in your explanations.
+## Prompt Categories
 
-**Expected Output:** A comprehensive report detailing errors and inconsistencies, organized by code section or error type, with actionable insights for improvement. 
-```
+### I. Code Quality & Understanding:
 
-### 2. Codebase Risk Assessment 
+- [Codebase Error and Inconsistency Analysis](prompt_library/quality_error_analysis.md)
+- [Codebase Risk Assessment](prompt_library/quality_risk_assessment.md)
+- [Codebase Documentation Generation](prompt_library/quality_documentation_generation.md)
 
-```bash
-**Objective:** Identify code segments within the provided codebase that could potentially lead to future issues.
+### II. Learning & Knowledge Extraction:
 
-**Instructions:**
+- [User Story Reconstruction from Code](prompt_library/learning_user_story_reconstruction.md)
+- [Code-Based Mini-Lesson Generation](prompt_library/learning_mini_lesson_generation.md)
 
-1. **Analyze the attached code** with a focus on:
-    * Code that is difficult to understand and maintain (code smells).
-    * Fragments that might cause errors under specific conditions (edge cases).
-    * Code that deviates from established coding standards.
-2. **Provide detailed justifications for your concerns**, explaining the potential risks associated with each identified segment.
-3. **Suggest potential solutions or mitigation strategies** to address the identified risks.
+### III. Code Improvement & Transformation:
 
-**Expected Output:** A report highlighting potential risk areas within the codebase, with clear explanations of the risks and actionable recommendations for improvement.
-```
+- [Codebase Best Practice Analysis](prompt_library/improvement_best_practice_analysis.md)
+- [Codebase Translation to Another Programming Language](prompt_library/improvement_language_translation.md)
+- [Codebase Refactoring for Improved Readability and Performance](prompt_library/improvement_refactoring.md)
 
-### 3. Codebase Documentation Generation
+### IV. Testing & Security:
 
-```bash
-**Objective:** Generate comprehensive and user-friendly documentation for the provided codebase.
+- [Unit Test Generation for Codebase](prompt_library/testing_unit_test_generation.md)
+- [Security Vulnerability Analysis of Codebase](prompt_library/security_vulnerability_analysis.md)
 
-**Instructions:**
-
-1. **Analyze the attached code** and identify key components, functionalities, and APIs.
-2. **Generate documentation that includes:**
-    * API specifications with detailed descriptions of endpoints, parameters, and responses.
-    * Function descriptions with clear explanations of their purpose, inputs, and outputs.
-    * Usage examples demonstrating how to interact with the codebase effectively.
-3. **Structure the documentation logically** and use a consistent format for clarity.
-4. **Prioritize clarity, conciseness, and accuracy** in your documentation.
-
-**Expected Output:**  Well-structured and informative documentation that facilitates understanding and utilization of the codebase by developers and other stakeholders.
-```
-
-## II. Learning & Knowledge Extraction:
-
-### 4. User Story Reconstruction from Code
-
-```bash
-**Objective:** Reconstruct the user stories that likely served as the basis for the development of the provided codebase.
-
-**Instructions:**
-
-1. **Analyze the attached code** to identify the core functionalities of the application.
-2. **Infer the user needs** that each functionality aims to address.
-3. **Formulate user stories** using the following template: "As a [user role], I want [functionality], so that [benefit]."
-4. **Identify potential missing user stories**. Suggest functionalities that could be added to the application to better meet user needs.
-
-**Expected Output:** A list of reconstructed user stories based on the code's functionalities, along with insights into potential missing user stories and suggestions for application enhancements.
-```
-
-### 5. Code-Based Mini-Lesson Generation
-
-```bash
-**Objective:** Create a series of mini-lessons that explain the key concepts implemented within the provided codebase.
-
-**Instructions:**
-
-1. **Divide the code into logical sections** and create a separate lesson for each.
-2. **Start with the simplest concepts** and gradually progress to more complex ones.
-3. **Use code examples from the application** to illustrate the discussed concepts.
-4. **Include exercises and quizzes** to help learners test their understanding.
-5. **Focus on clarity and pedagogical effectiveness** in your lesson design.
-
-**Expected Output:** A set of well-structured mini-lessons covering the key concepts of the application, with code examples, exercises, and quizzes to facilitate learning.
-```
-
-## III. Code Improvement & Transformation:
-
-### 6. Codebase Best Practice Analysis
-
-```bash
-**Objective:** Analyze the provided codebase and identify examples of both good and bad programming practices.
-
-**Instructions:**
-
-1. **Carefully review the attached code** and pinpoint instances of exemplary and problematic coding practices.
-2. **For each example, provide a detailed analysis** that includes:
-    * **What is good/bad about the specific solution?**
-    * **What concepts or principles underpin the solution?**
-    * **What are the potential positive/negative consequences of using this solution?**
-
-**Expected Output:** A comprehensive report highlighting both positive and negative coding practices within the codebase, with in-depth explanations and analysis of their impact.
-```
-
-### 7. Codebase Translation to Another Programming Language
-
-```bash
-**Objective:**  Translate the provided codebase from [Source Language] to [Target Language] while preserving its functionality and structure.
-
-**Instructions:**
-
-1. **Analyze the attached code** written in [Source Language] and understand its logic and functionalities.
-2. **Translate the code** into [Target Language], ensuring that the translated code performs the same tasks as the original code.
-3. **Maintain the original code's structure and organization** as much as possible in the translated version. 
-4. **Adhere to the coding conventions and best practices** of the target language.
-5. **Comment the translated code** to explain any significant changes or adaptations made during the translation process.
-
-**Expected Output:** A functional codebase in [Target Language] that accurately reflects the functionality and structure of the original [Source Language] codebase.
-```
-
-### 8. Codebase Refactoring for Improved Readability and Performance
-
-```bash
-**Objective:** Refactor the provided codebase to enhance its readability, maintainability, and performance.
-
-**Instructions:**
-
-1. **Analyze the attached code** and identify areas that can be improved in terms of code clarity, structure, and efficiency.
-2. **Suggest specific code transformations and optimizations** to address the identified areas for improvement.
-3. **Prioritize refactoring techniques** that improve code readability without introducing unnecessary complexity.
-4. **Consider performance implications** of your suggested refactoring and aim for solutions that enhance efficiency without sacrificing clarity. 
-5. **Provide clear explanations** for each refactoring suggestion, justifying its benefits and potential impact.
-
-**Expected Output:**  A set of actionable refactoring suggestions with detailed explanations of their benefits and potential impact on code quality and performance.
-```
-
-## IV. Testing & Security:
-
-### 9. Unit Test Generation for Codebase
-
-```bash
-**Objective:** Generate unit tests for the provided codebase to ensure code correctness and prevent regressions.
-
-**Instructions:**
-
-1. **Analyze the attached code** and identify its core functions and methods.
-2. **Generate unit tests** that cover a wide range of input values and expected outputs for each function/method.
-3. **Follow best practices for unit testing**, including:
-    * **Test one function/method per test case.**
-    * **Use descriptive test names.**
-    * **Assert expected outcomes clearly.**
-    * **Keep tests independent and isolated.**
-4. **Prioritize test coverage for critical functionalities** and edge cases.
-
-**Expected Output:** A comprehensive suite of unit tests that can be used to verify the correctness of the codebase and prevent regressions during future development.
-```
-
-### 10. Security Vulnerability Analysis of Codebase
-
-```bash
-**Objective:** Identify potential security vulnerabilities within the provided codebase.
-
-**Instructions:**
-
-1. **Analyze the attached code** with a focus on identifying common security weaknesses such as:
-    * SQL injection.
-    * Cross-site scripting (XSS).
-    * Cross-site request forgery (CSRF).
-    * Authentication and authorization bypasses.
-    * Data exposure.
-2. **For each identified vulnerability, provide a detailed explanation** of:
-    * The nature of the vulnerability.
-    * The potential impact of exploitation.
-    * Recommendations for mitigation using secure coding practices.
-3. **Prioritize vulnerabilities based on their severity and potential impact.**
-
-**Expected Output:** A comprehensive security report highlighting potential vulnerabilities within the codebase, along with clear explanations of their risks and actionable recommendations for remediation.
-```
+For detailed instructions on how to use these prompts, please refer to the individual files in the `prompt_library` directory.
