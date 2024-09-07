@@ -3,6 +3,7 @@ import subprocess
 import sys
 from github import Github
 from getpass import getpass
+from github.GithubException import GithubException  # Add this import
 
 def run_command(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -135,7 +136,7 @@ def main():
     try:
         repo.create_git_release(f"v{new_version}", f"Version {new_version}", change_description)
         print(f"GitHub release created for version {new_version}")
-    except github.GithubException as e:
+    except GithubException as e:
         if e.status == 403:
             print("Error: Unable to create GitHub release. Your personal access token may not have sufficient permissions.")
             print("Please update your token to include the 'repo' scope:")
@@ -145,6 +146,9 @@ def main():
             print("4. Update the token in this script or set it as an environment variable")
         else:
             print(f"An error occurred while creating the GitHub release: {str(e)}")
+        print("Continuing with PyPI upload...")
+    except Exception as e:
+        print(f"An unexpected error occurred while creating the GitHub release: {str(e)}")
         print("Continuing with PyPI upload...")
 
     # Build and upload to PyPI
