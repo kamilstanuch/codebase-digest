@@ -4,6 +4,9 @@ import sys
 from github import Github
 from getpass import getpass
 from github.GithubException import GithubException  # Add this import
+import keyring
+from twine.commands.upload import upload
+from twine.settings import Settings
 
 def run_command(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -102,6 +105,23 @@ def push_to_remote():
         print("Trying to push again...")
         run_command('git push -u origin main')
 
+def upload_to_pypi(dist_files):
+    username = os.environ.get('PYPI_USERNAME') or input("Enter your PyPI username: ")
+    password = os.environ.get('PYPI_PASSWORD') or keyring.get_password("pypi", username) or getpass("Enter your PyPI password: ")
+
+    settings = Settings(
+        username=username,
+        password=password,
+        repository_url='https://upload.pypi.org/legacy/'
+    )
+
+    try:
+        upload(settings, dist_files)
+        print("Successfully uploaded to PyPI")
+    except Exception as e:
+        print(f"Failed to upload to PyPI: {str(e)}")
+        print("Please ensure your PyPI credentials are correct and you have the necessary permissions.")
+
 def main():
     # Ensure we're in a git repository
     if not os.path.exists('.git'):
@@ -156,7 +176,9 @@ def main():
     run_command('python setup.py sdist bdist_wheel')
 
     print("Uploading to PyPI...")
-    run_command('python -m twine upload dist/*')
+    dist_files = [f for f in os.listdir('dist') if f.endswith(('.whl', '.tar.gz'))]
+    dist_files = [os.path.join('dist', f) for f in dist_files]
+    upload_to_pypi(dist_files)
 
     print(f"Package updated to version {new_version} and pushed to GitHub")
     print("Note: If the GitHub release creation failed, please create it manually on the GitHub website.")
