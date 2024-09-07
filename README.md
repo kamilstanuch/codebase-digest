@@ -98,3 +98,45 @@ You can use these prompts with various LLM interfaces:
 - [Security Vulnerability Analysis of Codebase](prompt_library/security_vulnerability_analysis.md)
 
 For detailed instructions on how to use these prompts, please refer to the individual files in the `prompt_library` directory.
+
+# Code Analysis Prompt Library
+
+This repository contains a collection of prompts designed to assist in various aspects of code analysis, improvement, and documentation.
+
+## Available Prompts
+
+1. **User Story Reconstruction** (`learning_user_story_reconstruction.md`)
+   - Reconstruct and structure user stories based on the provided codebase.
+
+2. **Risk Assessment** (`quality_risk_assessment.md`)
+   - Identify potential risks within the codebase.
+
+3. **Best Practice Analysis** (`improvement_best_practice_analysis.md`)
+   - Analyze the codebase for good and bad programming practices.
+
+4. **Language Translation** (`improvement_language_translation.md`)
+   - Translate the codebase from one programming language to another.
+
+5. **Refactoring** (`improvement_refactoring.md`)
+   - Suggest refactoring improvements for better readability and performance.
+
+6. **Unit Test Generation** (`testing_unit_test_generation.md`)
+   - Generate unit tests for the provided codebase.
+
+7. **Business Impact Analysis** (`business_impact_analysis.md`)
+   - Analyze the codebase to identify key features and their potential business impact.
+
+8. **Stakeholder Persona Generation** (`stakeholder_persona_generation.md`)
+   - Infer potential stakeholder personas based on the functionalities present in the codebase.
+
+## Usage
+
+To use these prompts, select the appropriate prompt file for your analysis needs and follow the instructions provided within each prompt.
+
+## Contributing
+
+Contributions to expand and improve this prompt library are welcome. Please submit a pull request with your suggested changes or additions.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
