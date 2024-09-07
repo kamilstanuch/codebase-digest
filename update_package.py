@@ -18,18 +18,18 @@ def run_command(command):
 
 def update_version():
     with open('setup.py', 'r') as f:
-        content = f.read()
+        content = f.readlines()
     
-    version_line = [line for line in content.split('\n') if line.strip().startswith('version=')][0]
-    current_version = version_line.split('=')[1].strip().strip("'")
-    
-    print(f"Current version: {current_version}")
-    new_version = input("Enter new version number: ")
-    
-    updated_content = content.replace(f"version='{current_version}'", f"version='{new_version}'")
+    for i, line in enumerate(content):
+        if line.strip().startswith('version='):
+            current_version = line.split('=')[1].strip().strip("'").strip('"')
+            print(f"Current version: {current_version}")
+            new_version = input("Enter new version number: ")
+            content[i] = f"    version='{new_version}',\n"
+            break
     
     with open('setup.py', 'w') as f:
-        f.write(updated_content)
+        f.writelines(content)
     
     return new_version
 
@@ -132,6 +132,11 @@ def main():
     except GithubException as e:
         print(f"An error occurred while creating the GitHub release: {str(e)}")
         print("Please create the release manually on the GitHub website.")
+
+    print("Cleaning old distribution files...")
+    if os.path.exists('dist'):
+        for file in os.listdir('dist'):
+            os.remove(os.path.join('dist', file))
 
     print("Building distribution...")
     if run_command('python setup.py sdist bdist_wheel') is False:
