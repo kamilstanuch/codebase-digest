@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="codebase-digest",
-    version='0.1.36',
+    version='0.1.37',
     author="Kamil Stanuch",
     description="Consolidates and analyzes codebases for insights.",
     long_description=long_description,
