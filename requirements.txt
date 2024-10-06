@@ -17,7 +17,3 @@ typing_extensions>=4.12.2
 urllib3>=2.2.3
 wrapt>=1.16.0
 keyring
-PyGithub
-twine
-packaging
-setuptools

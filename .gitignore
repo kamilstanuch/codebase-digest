@@ -39,8 +39,4 @@ ENV/
 ehthumbs.db
 Thumbs.db
 
-# Local development scripts
-update_package.py
-update_package.sh
-
 *.egg-info/

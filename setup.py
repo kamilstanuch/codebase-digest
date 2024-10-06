@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 import os
 
-def read_requirements():
-    """Read the requirements from requirements.txt"""
+def read_requirements(filename='requirements.txt'):
+    """Read the requirements from the given filename"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
     try:
-        with open(os.path.join(current_dir, 'requirements.txt'), encoding='utf-8') as f:
+        with open(os.path.join(current_dir, filename), encoding='utf-8') as f:
             return [line.strip() for line in f if line.strip() and not line.startswith('#')]
     except FileNotFoundError:
         return []
@@ -35,6 +35,9 @@ setup(
     ],
     keywords="code analysis, codebase, consolidation, visualization",
     install_requires=read_requirements(),
+    extras_require={
+        'dev': read_requirements('requirements-dev.txt'),
+    },
     entry_points={
         "console_scripts": [
             "cdigest=codebase_digest.app:main",

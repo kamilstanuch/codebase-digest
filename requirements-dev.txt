@@ -1,0 +1,4 @@
+PyGithub
+twine
+packaging
+setuptools
