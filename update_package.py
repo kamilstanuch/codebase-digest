@@ -106,29 +106,35 @@ def upload_to_pypi(dist_files, max_attempts=3):
                 return False
 
 def update_version():
-    with open('setup.py', 'r') as f:
-        content = f.readlines()
+    with open('VERSION', 'r') as f:
+        current_version = f.read().strip()
     
-    for i, line in enumerate(content):
-        if line.strip().startswith('version='):
-            current_version = line.split('=')[1].strip().strip("'").strip('"')
-            print(f"Current version: {current_version}")
-            while True:
-                new_version = input("Enter new version number (e.g., 0.1.7): ")
-                if re.match(r'^\d+(\.\d+){0,2}(\.?[a-zA-Z0-9]+)?$', new_version):
-                    try:
-                        version.parse(new_version)
-                        break
-                    except version.InvalidVersion:
-                        print("Invalid version format. Please use a valid version number.")
-                else:
-                    print("Invalid version format. Please use a valid version number.")
-            content[i] = f"    version='{new_version}',\n"
-            break
+    print(f"Current version: {current_version}")
+    while True:
+        new_version = input("Enter new version number (e.g., 0.1.7): ")
+        if re.match(r'^\d+(\.\d+){0,2}(\.?[a-zA-Z0-9]+)?$', new_version):
+            try:
+                version.parse(new_version)
+                break
+            except version.InvalidVersion:
+                print("Invalid version format. Please use a valid version number.")
+        else:
+            print("Invalid version format. Please use a valid version number.")
+    
+    # Update VERSION file
+    with open('VERSION', 'w') as f:
+        f.write(new_version)
+    
+    # Update setup.py
+    with open('setup.py', 'r') as f:
+        content = f.read()
+    
+    updated_content = re.sub(r"version=['\"][\d.]+['\"]", f"version='{new_version}'", content)
     
     with open('setup.py', 'w') as f:
-        f.writelines(content)
+        f.write(updated_content)
     
+    print(f"Updated VERSION file and setup.py with new version: {new_version}")
     return new_version
 
 def main():

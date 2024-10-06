@@ -1,6 +1,9 @@
 from setuptools import setup, find_packages
 import os
 
+with open('VERSION') as f:
+    version = f.read().strip()
+
 def read_requirements(filename='requirements.txt'):
     """Read the requirements from the given filename"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -15,7 +18,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="codebase-digest",
-    version='0.1.38',
+    version=version,
     author="Kamil Stanuch",
     description="Consolidates and analyzes codebases for insights.",
     long_description=long_description,

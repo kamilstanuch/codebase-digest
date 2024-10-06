@@ -1,0 +1,5 @@
+include VERSION
+include README.md
+include requirements.txt
+include requirements-dev.txt
+recursive-include codebase_digest/prompt_library *.md
