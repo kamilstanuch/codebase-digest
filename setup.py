@@ -1,4 +1,14 @@
 from setuptools import setup, find_packages
+import os
+
+def read_requirements():
+    """Read the requirements from requirements.txt"""
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    try:
+        with open(os.path.join(current_dir, 'requirements.txt'), encoding='utf-8') as f:
+            return [line.strip() for line in f if line.strip() and not line.startswith('#')]
+    except FileNotFoundError:
+        return []
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -24,12 +34,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     keywords="code analysis, codebase, consolidation, visualization",
-    install_requires=[
-        "tiktoken",
-        "colorama",
-        "PyGithub",
-        "pyperclip",
-    ],
+    install_requires=read_requirements(),
     entry_points={
         "console_scripts": [
             "cdigest=codebase_digest.app:main",
