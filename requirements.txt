@@ -20,3 +20,4 @@ keyring
 PyGithub
 twine
 packaging
+setuptools
