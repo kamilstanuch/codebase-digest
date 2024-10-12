@@ -167,35 +167,36 @@ Codebase Digest includes a comprehensive set of prompts in the `prompt_library` 
 
 ### Prompt Categories
 
-1. **Code Quality & Understanding**
-   - [Error and Inconsistency Analysis](prompt_library/quality_error_analysis.md)
-   - [Risk Assessment](prompt_library/quality_risk_assessment.md)
-   - [Documentation Generation](prompt_library/quality_documentation_generation.md)
+#### I. Code Quality & Understanding:
+- [Codebase Error and Inconsistency Analysis](prompt_library/quality_error_analysis.md): Identify and analyze errors and inconsistencies in the codebase.
+- [Codebase Risk Assessment](prompt_library/quality_risk_assessment.md): Evaluate potential risks within the codebase.
+- [Codebase Documentation Generation](prompt_library/quality_documentation_generation.md): Automatically generate or improve codebase documentation.
 
-2. **Learning & Knowledge Extraction**
-   - [User Story Reconstruction](prompt_library/learning_user_story_reconstruction.md)
-   - [Mini-Lesson Generation](prompt_library/learning_mini_lesson_generation.md)
+#### II. Learning & Knowledge Extraction:
+- [User Story Reconstruction from Code](prompt_library/learning_user_story_reconstruction.md): Reconstruct and structure user stories based on the codebase.
+- [Code-Based Mini-Lesson Generation](prompt_library/learning_mini_lesson_generation.md): Create mini-lessons to explain complex coding concepts or architectures.
 
-3. **Code Improvement & Transformation**
-   - [Best Practice Analysis](prompt_library/improvement_best_practice_analysis.md)
-   - [Language Translation](prompt_library/improvement_language_translation.md)
-   - [Refactoring Suggestions](prompt_library/improvement_refactoring.md)
+#### III. Code Improvement & Transformation:
+- [Codebase Best Practice Analysis](prompt_library/improvement_best_practice_analysis.md): Analyze the codebase for good and bad programming practices.
+- [Codebase Translation to Another Programming Language](prompt_library/improvement_language_translation.md): Translate the codebase from one programming language to another.
+- [Codebase Refactoring for Improved Readability and Performance](prompt_library/improvement_refactoring.md): Suggest refactoring improvements for better readability and performance.
 
-4. **Testing & Security**
-   - [Unit Test Generation](prompt_library/testing_unit_test_generation.md)
-   - [Security Vulnerability Analysis](prompt_library/security_vulnerability_analysis.md)
+#### IV. Testing & Security:
+- [Unit Test Generation for Codebase](prompt_library/testing_unit_test_generation.md): Generate unit tests for the provided codebase.
+- [Security Vulnerability Analysis of Codebase](prompt_library/security_vulnerability_analysis.md): Identify potential security vulnerabilities in the codebase.
 
-5. **Business & Stakeholder Analysis**
-   - [Business Impact Analysis](prompt_library/business_impact_analysis.md)
-   - [Stakeholder Persona Generation](prompt_library/stakeholder_persona_generation.md)
-   - [Business Model Canvas Analysis](prompt_library/business_model_canvas_analysis.md)
-   - [Value Proposition Canvas Analysis](prompt_library/value_proposition_canvas_analysis.md)
-   - [SWOT Analysis](prompt_library/swot_analysis.md)
-   - [Jobs to be Done (JTBD) Analysis](prompt_library/jobs_to_be_done_analysis.md)
-   - [Lean Canvas Analysis](prompt_library/lean_canvas_analysis.md)
-   - [OKR Analysis](prompt_library/okr_analysis.md)
-   - [Customer Journey Map Analysis](prompt_library/customer_journey_map_analysis.md)
-   - [Value Chain Analysis](prompt_library/value_chain_analysis.md)
+#### V. Business & Stakeholder Analysis:
+- [Business Impact Analysis](prompt_library/business_impact_analysis.md): Identify key features and their potential business impact.
+- [Stakeholder Persona Generation](prompt_library/stakeholder_persona_generation.md): Infer potential stakeholder personas based on codebase functionalities.
+- [Business Model Canvas Analysis](prompt_library/business_model_canvas_analysis.md): Analyze business implications using the Business Model Canvas framework.
+- [Value Proposition Canvas Analysis](prompt_library/value_proposition_canvas_analysis.md): Align technical features with user needs and benefits.
+- [SWOT Analysis](prompt_library/swot_analysis.md): Evaluate the codebase's current state and future potential.
+- [Jobs to be Done (JTBD) Analysis](prompt_library/jobs_to_be_done_analysis.md): Understand core user needs and identify potential improvements.
+- [Lean Canvas Analysis](prompt_library/lean_canvas_analysis.md): Evaluate business potential and identify areas for improvement or pivot.
+- [OKR (Objectives and Key Results) Analysis](prompt_library/okr_analysis.md): Align codebase features with potential business objectives and key results.
+- [Customer Journey Map Analysis](prompt_library/customer_journey_map_analysis.md): Map how different parts support various stages of the user's journey.
+- [Value Chain Analysis](prompt_library/value_chain_analysis.md): Understand how the codebase supports the larger value creation process.
+
 
 For detailed instructions on using these prompts, refer to the individual files in the `prompt_library` directory.
 
