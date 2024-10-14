@@ -65,9 +65,13 @@ def should_ignore(path, base_path, ignore_patterns):
     return False
 
 def is_text_file(file_path):
-    """Determines if a file is a text file based on its MIME type."""
-    mime_type, _ = mimetypes.guess_type(file_path)
-    return mime_type and mime_type.startswith('text')
+    """Determines if a file is likely a text file based on its content."""
+    try:
+        with open(file_path, 'rb') as file:
+            chunk = file.read(1024)
+        return not bool(chunk.translate(None, bytes([7, 8, 9, 10, 12, 13, 27] + list(range(0x20, 0x100)))))
+    except IOError:
+        return False
 
 def count_tokens(text):
     """Counts the number of tokens in a text string using tiktoken."""
