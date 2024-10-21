@@ -170,14 +170,33 @@ Codebase Digest includes a comprehensive set of prompts in the `prompt_library` 
 #### I. Code Quality & Understanding:
 - **Analysis:**
     - [Codebase Error and Inconsistency Analysis](prompt_library/quality_error_analysis.md): Identify and analyze errors and inconsistencies in the codebase.
-    - [Codebase Risk Assessment](prompt_library/quality_risk_assessment.md): Evaluate potential risks within the codebase (e.g., security vulnerabilities, maintainability issues). 
+    - [Codebase Risk Assessment](prompt_library/quality_risk_assessment.md): Evaluate potential risks within the codebase (e.g., security vulnerabilities, maintainability issues).
+    - [Code Complexity Analysis](prompt_library/quality_code_complexity_analysis.md): Identify areas with high cyclomatic complexity, deep nesting, or excessive method lengths.
+    - [Code Duplication Analysis](prompt_library/quality_code_duplication_analysis.md): Identify duplicated code fragments and suggest refactoring opportunities.
+    - [Code Style Consistency Analysis](prompt_library/quality_code_style_consistency_analysis.md): Analyze the codebase for consistency in code style, naming conventions, and formatting.
+    - [Code Documentation Coverage Analysis](prompt_library/quality_code_documentation_coverage_analysis.md): Determine the coverage and quality of code documentation.
 - **Generation:**
     - [Codebase Documentation Generation](prompt_library/quality_documentation_generation.md): Automatically generate or improve codebase documentation.
 
 #### II. Learning & Knowledge Extraction:
+- **Analysis:**
+    - [Frontend Code Analysis](prompt_library/learning_frontend_code_analysis.md): Analyze the frontend codebase to identify best practices, potential improvements, and common pitfalls.
+    - [Backend Code Analysis](prompt_library/learning_backend_code_analysis.md): Analyze the backend codebase to identify best practices, potential improvements, and common pitfalls.
+    - [Code Style and Readability Analysis](prompt_library/learning_code_style_readability_analysis.md): Evaluate the codebase's overall style and readability, providing suggestions for improvement.
+    - [Personal Development Recommendations](prompt_library/learning_personal_development_recommendations.md): Analyze the codebase and provide personalized recommendations for areas where the engineer can improve their skills.
 - **Generation:**
     - [User Story Reconstruction from Code](prompt_library/learning_user_story_reconstruction.md): Reconstruct and structure user stories based on the codebase.
     - [Code-Based Mini-Lesson Generation](prompt_library/learning_mini_lesson_generation.md): Create mini-lessons to explain complex coding concepts or architectures.
+    - [Algorithmic Storytelling](prompt_library/learning_algorithmic_storytelling.md): Generate engaging narratives that explain the logic and flow of key algorithms in the codebase.
+    - [Code Pattern Recognition and Explanation](prompt_library/learning_code_pattern_recognition.md): Identify and explain design patterns, architectural patterns, and common coding idioms used in the codebase.
+    - [Socratic Dialogue Generation for Code Review](prompt_library/learning_socratic_dialogue_code_review.md): Generate Socratic-style dialogues that explore the reasoning behind code design decisions and encourage critical thinking during code reviews.
+    - [Code Evolution Visualization](prompt_library/learning_code_evolution_visualization.md): Create visualizations that illustrate how the codebase has evolved over time, highlighting key milestones, refactorings, and architectural changes.
+    - [Codebase Trivia Game Generation](prompt_library/learning_codebase_trivia_game.md): Generate trivia questions and answers based on the codebase to gamify learning and encourage team engagement.
+    - [Code-Inspired Analogies and Metaphors](prompt_library/learning_code_analogies_metaphors.md): Generate analogies and metaphors inspired by the codebase to help explain complex technical concepts to non-technical stakeholders.
+    - [Frontend Component Documentation](prompt_library/learning_frontend_component_documentation.md): Generate documentation for frontend components, including props, usage examples, and best practices.
+    - [Backend API Documentation](prompt_library/learning_backend_api_documentation.md): Generate documentation for backend APIs, including endpoints, request/response formats, and authentication requirements.
+    - [Code Refactoring Exercises](prompt_library/learning_code_refactoring_exercises.md): Generate code refactoring exercises based on the codebase to help engineers improve their refactoring skills.
+    - [Code Review Checklist Generation](prompt_library/learning_code_review_checklist.md): Generate a checklist of important points to consider during code reviews, based on the codebase's specific requirements and best practices.
 
 #### III. Code Improvement & Transformation:
 - **Analysis:**
@@ -261,4 +280,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+
 
