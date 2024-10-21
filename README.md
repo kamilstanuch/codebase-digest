@@ -195,16 +195,26 @@ Codebase Digest includes a comprehensive set of prompts in the `prompt_library` 
 #### V. Business & Stakeholder Analysis:
 - **Analysis:**
     - [Business Impact Analysis](prompt_library/business_impact_analysis.md): Identify key features and their potential business impact.
-    - [Business Model Canvas Analysis](prompt_library/business_model_canvas_analysis.md): Analyze business implications using the Business Model Canvas framework.
-    - [Value Proposition Canvas Analysis](prompt_library/value_proposition_canvas_analysis.md): Align technical features with user needs and benefits.
     - [SWOT Analysis](prompt_library/swot_analysis.md): Evaluate the codebase's current state and future potential.
     - [Jobs to be Done (JTBD) Analysis](prompt_library/jobs_to_be_done_analysis.md): Understand core user needs and identify potential improvements.
-    - [Lean Canvas Analysis](prompt_library/lean_canvas_analysis.md): Evaluate business potential and identify areas for improvement or pivot.
     - [OKR (Objectives and Key Results) Analysis](prompt_library/okr_analysis.md): Align codebase features with potential business objectives and key results.
-    - [Customer Journey Map Analysis](prompt_library/customer_journey_map_analysis.md): Map how different parts support various stages of the user's journey.
-    - [Value Chain Analysis](prompt_library/value_chain_analysis.md): Understand how the codebase supports the larger value creation process. 
+    - [Value Chain Analysis](prompt_library/value_chain_analysis.md): Understand how the codebase supports the larger value creation process.
+    - [Porter's Five Forces Analysis](prompt_library/porters_five_forces_analysis.md): Analyze competitive forces shaping the product's market.
+    - [Product/Market Fit Analysis](prompt_library/product_market_fit_analysis.md): Evaluate how well the product meets market needs.
+    - [PESTEL Analysis](prompt_library/pestel_analysis.md): Analyze macro-environmental factors affecting the product.
 - **Generation:**
-    - [Stakeholder Persona Generation](prompt_library/stakeholder_persona_generation.md): Infer potential stakeholder personas based on codebase functionalities. 
+    - [Business Model Canvas Generation](prompt_library/business_model_canvas_analysis.md): Create a Business Model Canvas based on codebase analysis.
+    - [Value Proposition Canvas Generation](prompt_library/value_proposition_canvas_analysis.md): Generate a Value Proposition Canvas aligning technical features with user needs and benefits.
+    - [Lean Canvas Generation](prompt_library/lean_canvas_analysis.md): Create a Lean Canvas to evaluate business potential and identify areas for improvement or pivot.
+    - [Customer Journey Map Creation](prompt_library/customer_journey_map_analysis.md): Generate a map showing how different parts support various stages of the user's journey.
+    - [Blue Ocean Strategy Canvas](prompt_library/blue_ocean_strategy_analysis.md): Create a strategy canvas to identify untapped market space and new demand.
+    - [Ansoff Matrix Generation](prompt_library/ansoff_matrix_analysis.md): Produce an Ansoff Matrix to evaluate growth strategies for the product.
+    - [BCG Growth-Share Matrix Creation](prompt_library/bcg_matrix_analysis.md): Generate a BCG Matrix to assess the product portfolio and resource allocation.
+    - [Kano Model Diagram](prompt_library/kano_model_analysis.md): Create a Kano Model diagram to prioritize product features based on customer satisfaction.
+    - [Technology Adoption Lifecycle Curve](prompt_library/tech_adoption_lifecycle_analysis.md): Generate a curve showing the product's position in the adoption lifecycle.
+    - [Competitive Positioning Map](prompt_library/competitive_positioning_map.md): Create a visual map of the product's position relative to competitors.
+    - [McKinsey 7S Framework Diagram](prompt_library/mckinsey_7s_analysis.md): Generate a diagram evaluating internal elements for organizational effectiveness.
+    - [Stakeholder Persona Generation](prompt_library/stakeholder_persona_generation.md): Infer and create potential stakeholder personas based on codebase functionalities.
 
 #### VI. Architecture & Design:
 - **Analysis:**
@@ -251,3 +261,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
