@@ -12,6 +12,7 @@ import sys
 import pyperclip
 import xml.etree.ElementTree as ET
 import html
+from input_handler import InputHandler
 
 # Initialize colorama for colorful console output.
 init()
@@ -371,12 +372,15 @@ def main():
                         help="Maximum allowed text content size in KB (default: 10240 KB)")
     parser.add_argument("--copy-to-clipboard", action="store_true", 
                         help="Copy the output to clipboard after analysis")
+    parser.add_argument("--no-input", action="store_true", help="Run the script without any user input")
     
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
 
     args = parser.parse_args()
+
+    input_handler = InputHandler(no_input=args.no_input)
 
     if not args.path:
         print(Fore.RED + "Error: Path argument is required." + Style.RESET_ALL)
@@ -400,7 +404,7 @@ def main():
 
     if estimated_size / 1024 > args.max_size:
         print(Fore.YELLOW + f"\nWarning: The estimated output size ({estimated_size / 1024:.2f} KB) exceeds the maximum allowed size ({args.max_size} KB)." + Style.RESET_ALL)
-        proceed = input("Do you want to proceed? (y/n): ").lower().strip()
+        proceed = input_handler.get_input("Do you want to proceed? (y/n): ")
         if proceed != 'y':
             print(Fore.YELLOW + "Analysis aborted." + Style.RESET_ALL)
             sys.exit(0)
@@ -459,7 +463,7 @@ def main():
             except Exception as e:
                 print(Fore.RED + f"Failed to copy to clipboard: {str(e)}" + Style.RESET_ALL)
         else:
-            copy_to_clipboard = input("Do you want to copy the output to clipboard? (y/n): ").lower().strip()
+            copy_to_clipboard = input_handler.get_input("Do you want to copy the output to clipboard? (y/n): ")
             if copy_to_clipboard == 'y':
                 try:
                     pyperclip.copy(output)
@@ -473,7 +477,7 @@ def main():
 
     if data['text_content_size'] / 1024 > args.max_size:
         print(Fore.RED + f"\nWarning: The text content size ({data['text_content_size'] / 1024:.2f} KB) exceeds the maximum allowed size ({args.max_size} KB)." + Style.RESET_ALL)
-        proceed = input("Do you want to proceed? (y/n): ").lower().strip()
+        proceed = input_handler.get_input("Do you want to proceed? (y/n): ")
         if proceed != 'y':
             print(Fore.YELLOW + "Analysis aborted." + Style.RESET_ALL)
             sys.exit(0)
