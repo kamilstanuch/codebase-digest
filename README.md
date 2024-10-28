@@ -98,6 +98,7 @@ Examples:
 | `--include-git` | Include .git directory in the analysis |
 | `--max-size` | Maximum allowed text content size in KB (default: 10240 KB) |
 | `--copy-to-clipboard` | Copy the output to clipboard |
+| `--no-input` | Surpress all user prompts and default answers to "y" (yes). Useful if you want to use this app as script in your pipelines, e.g. as Github Actions |
 
 ## Ignore Functionality
 
