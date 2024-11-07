@@ -2,3 +2,4 @@ PyGithub
 twine
 packaging
 setuptools
+unittest
