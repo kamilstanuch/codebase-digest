@@ -5,14 +5,13 @@ import argparse
 import json
 from collections import defaultdict
 import fnmatch
-import mimetypes
-import tiktoken
 from colorama import init, Fore, Back, Style
 import sys
 import pyperclip
 import xml.etree.ElementTree as ET
 import html
 from input_handler import InputHandler
+from models import NodeAnalysis, TextFileAnalysis, DirectoryAnalysis
 
 # Initialize colorama for colorful console output.
 init()
@@ -74,15 +73,6 @@ def is_text_file(file_path):
     except IOError:
         return False
 
-def count_tokens(text):
-    """Counts the number of tokens in a text string using tiktoken."""
-    enc = tiktoken.get_encoding("cl100k_base")
-    try:
-        return len(enc.encode(text, disallowed_special=()))
-    except Exception as e:
-        print(f"Warning: Error counting tokens: {str(e)}")
-        return 0
-
 def read_file_content(file_path):
     """Reads the content of a file, handling potential encoding errors."""
     try:
@@ -91,22 +81,12 @@ def read_file_content(file_path):
     except Exception as e:
         return f"Error reading file: {str(e)}"
 
-def analyze_directory(path, ignore_patterns, base_path, include_git=False, max_depth=None, current_depth=0):
+def analyze_directory(path, ignore_patterns, base_path, include_git=False, max_depth=None, current_depth=0) -> DirectoryAnalysis:
     """Recursively analyzes a directory and its contents."""
     if max_depth is not None and current_depth > max_depth:
         return None
 
-    result = {
-        "name": os.path.basename(path),
-        "type": "directory",
-        "size": 0,
-        "children": [],
-        "total_tokens": 0,
-        "file_count": 0,
-        "dir_count": 0,
-        "text_content_size": 0,
-        "total_text_size": 0  # New field for total size of all text files
-    }
+    result = DirectoryAnalysis(name=os.path.basename(path))
 
     try:
         for item in os.listdir(path):
@@ -121,7 +101,6 @@ def analyze_directory(path, ignore_patterns, base_path, include_git=False, max_d
 
             if os.path.isfile(item_path) and is_text_file(item_path):
                 file_size = os.path.getsize(item_path)
-                result["total_text_size"] += file_size
 
             if is_ignored:
                 continue  # Skip ignored items for further analysis
@@ -134,133 +113,116 @@ def analyze_directory(path, ignore_patterns, base_path, include_git=False, max_d
                 is_text = is_text_file(item_path)
                 if is_text:
                     content = read_file_content(item_path)
-                    tokens = count_tokens(content)
                     print(f"Debug: Text file {item_path}, size: {file_size}, content size: {len(content)}")
                 else:
                     content = "[Non-text file]"
-                    tokens = 0
                     print(f"Debug: Non-text file {item_path}, size: {file_size}")
-                child = {
-                    "name": item,
-                    "type": "file",
-                    "size": file_size,
-                    "tokens": tokens,
-                    "content": content,
-                    "is_ignored": is_ignored
-                }
-                result["children"].append(child)
-                if not is_ignored:
-                    result["size"] += file_size
-                    result["total_tokens"] += tokens
-                    result["file_count"] += 1
-                    if is_text:
-                        result["text_content_size"] += len(content)
+                child = TextFileAnalysis(name=item, 
+                                         size=file_size, 
+                                         file_content=content, 
+                                         is_ignored=is_ignored)
+                result.children.append(child)
             elif os.path.isdir(item_path):
                 subdir = analyze_directory(item_path, ignore_patterns, base_path, include_git, max_depth, current_depth + 1)
                 if subdir:
-                    subdir["is_ignored"] = is_ignored
-                    result["children"].append(subdir)
-                    if not is_ignored:
-                        result["size"] += subdir["size"]
-                        result["total_tokens"] += subdir["total_tokens"]
-                        result["file_count"] += subdir["file_count"]
-                        result["dir_count"] += 1 + subdir["dir_count"]
-                        result["text_content_size"] += subdir["text_content_size"]
+                    subdir.is_ignored = is_ignored
+                    result.children.append(subdir)
+                    
     except PermissionError:
         print(Fore.RED + f"Permission denied: {path}" + Style.RESET_ALL)
 
     return result
 
-def generate_tree_string(node, prefix="", is_last=True, show_size=False, show_ignored=False, use_color=False):
+def generate_tree_string(node: NodeAnalysis, prefix="", is_last=True, show_size=False, show_ignored=False, use_color=False):
     """Generates a string representation of the directory tree."""
-    if node.get("is_ignored", False) and not show_ignored:
+    if node.is_ignored and not show_ignored:
         return ""
 
     if use_color:
         result = prefix + (Fore.GREEN + "└── " if is_last else "├── ")
-        result += Fore.BLUE + node["name"] + Style.RESET_ALL
+        result += Fore.BLUE + node.name + Style.RESET_ALL
     else:
-        result = prefix + ("└── " if is_last else "├── ") + node["name"]
+        result = prefix + ("└── " if is_last else "├── ") + node.name
 
-    if show_size and node["type"] == "file":
-        size_str = f" ({node['size']} bytes)"
+    if show_size and isinstance(node, TextFileAnalysis):
+        size_str = f" ({node.size} bytes)"
         result += Fore.YELLOW + size_str + Style.RESET_ALL if use_color else size_str
 
-    if node.get("is_ignored", False):
+    if node.is_ignored:
         ignored_str = " [IGNORED]"
         result += Fore.RED + ignored_str + Style.RESET_ALL if use_color else ignored_str
 
     result += "\n"
 
-    if node["type"] == "directory":
+    if isinstance(node, DirectoryAnalysis):
         prefix += "    " if is_last else "│   "
-        children = node["children"]
+        children = node.children
         if not show_ignored:
-            children = [child for child in children if not child.get("is_ignored", False)]
+            children = [child for child in children if not child.is_ignored]
         for i, child in enumerate(children):
             result += generate_tree_string(child, prefix, i == len(children) - 1, show_size, show_ignored, use_color)
     return result
 
-def generate_summary_string(data, estimated_size, use_color=True):
+def generate_summary_string(data: DirectoryAnalysis, estimated_size, use_color=True):
     summary = "\nSummary:\n"
-    summary += f"Total files analyzed: {data['file_count']}\n"
-    summary += f"Total directories analyzed: {data['dir_count']}\n"
+    summary += f"Total files analyzed: {data.get_file_count()}\n"
+    summary += f"Total directories analyzed: {data.get_dir_count()}\n"
     summary += f"Estimated output size: {estimated_size / 1024:.2f} KB\n"
-    summary += f"Actual analyzed size: {data['size'] / 1024:.2f} KB\n"
-    summary += f"Total tokens: {data['total_tokens']}\n"
-    summary += f"Actual text content size: {data['text_content_size'] / 1024:.2f} KB\n"
+    summary += f"Actual analyzed size: {data.get_total_text_file_size() / 1024:.2f} KB\n"
+    summary += f"Total tokens: {data.get_total_tokens()}\n"
+    summary += f"Actual text content size: {data.get_text_content_size() / 1024:.2f} KB\n"
     
     if use_color:
         return Fore.CYAN + summary + Style.RESET_ALL
     return summary
 
-def generate_content_string(data):
+def generate_content_string(data: NodeAnalysis):
     """Generates a structured representation of file contents."""
     content = []
 
     def add_file_content(node, path=""):
-        if node["type"] == "file" and not node.get("is_ignored", False) and node["content"] != "[Non-text file]":
+        if isinstance(node, TextFileAnalysis) and not node.is_ignored and node.file_content != "[Non-text file]":
             content.append({
-                "path": os.path.join(path, node["name"]),
-                "content": node["content"]
+                "path": os.path.join(path, node.name),
+                "content": node.file_content
             })
-        elif node["type"] == "directory":
-            for child in node["children"]:
-                add_file_content(child, os.path.join(path, node["name"]))
+        elif isinstance(node, DirectoryAnalysis):
+            for child in node.children:
+                add_file_content(child, os.path.join(path, node.name))
 
     add_file_content(data)
     return content
 
-def generate_markdown_output(data):
-    output = f"# Codebase Analysis for: {data['name']}\n\n"
+def generate_markdown_output(data: DirectoryAnalysis):
+    output = f"# Codebase Analysis for: {data.name}\n\n"
     output += "## Directory Structure\n\n"
     output += "```\n"
     output += generate_tree_string(data, show_size=True, show_ignored=True)
     output += "```\n\n"
     output += "## Summary\n\n"
-    output += f"- Total files: {data['file_count']}\n"
-    output += f"- Total directories: {data['dir_count']}\n"
-    output += f"- Analyzed size: {data['size'] / 1024:.2f} KB\n"
-    output += f"- Total text file size (including ignored): {data['total_text_size'] / 1024:.2f} KB\n"
-    output += f"- Total tokens: {data['total_tokens']}\n"
-    output += f"- Analyzed text content size: {data['text_content_size'] / 1024:.2f} KB\n\n"
+    output += f"- Total files: {data.get_file_count()}\n"
+    output += f"- Total directories: {data.get_dir_count()}\n"
+    output += f"- Analyzed size: {data.get_text_content_size() / 1024:.2f} KB\n"
+    output += f"- Total text file size (including ignored): {data.get_total_text_file_size() / 1024:.2f} KB\n"
+    output += f"- Total tokens: {data.get_total_tokens()}\n"
+    output += f"- Analyzed text content size: {data.get_text_content_size() / 1024:.2f} KB\n\n"
     output += "## File Contents\n\n"
     for file in generate_content_string(data):
         output += f"### {file['path']}\n\n```\n{file['content']}\n```\n\n"
     return output
 
-def generate_xml_output(data):
+def generate_xml_output(data: DirectoryAnalysis):
     root = ET.Element("codebase-analysis")
-    ET.SubElement(root, "name").text = data['name']
+    ET.SubElement(root, "name").text = data.name
     structure = ET.SubElement(root, "directory-structure")
     structure.text = generate_tree_string(data, show_size=True, show_ignored=True)
     summary = ET.SubElement(root, "summary")
-    ET.SubElement(summary, "total-files").text = str(data['file_count'])
-    ET.SubElement(summary, "total-directories").text = str(data['dir_count'])
-    ET.SubElement(summary, "analyzed-size-kb").text = f"{data['size'] / 1024:.2f}"
-    ET.SubElement(summary, "total-text-file-size-kb").text = f"{data['total_text_size'] / 1024:.2f}"
-    ET.SubElement(summary, "total-tokens").text = str(data['total_tokens'])
-    ET.SubElement(summary, "analyzed-text-content-size-kb").text = f"{data['text_content_size'] / 1024:.2f}"
+    ET.SubElement(summary, "total-files").text = str(data.get_file_count())
+    ET.SubElement(summary, "total-directories").text = str(data.get_dir_count())
+    ET.SubElement(summary, "analyzed-size-kb").text = f"{data.get_total_text_file_size() / 1024:.2f}"
+    ET.SubElement(summary, "total-text-file-size-kb").text = f"{data.get_total_text_file_size / 1024:.2f}"
+    ET.SubElement(summary, "total-tokens").text = str(data.get_total_tokens())
+    ET.SubElement(summary, "analyzed-text-content-size-kb").text = f"{data.get_text_content_size() / 1024:.2f}"
     contents = ET.SubElement(root, "file-contents")
     for file in generate_content_string(data):
         file_elem = ET.SubElement(contents, "file")
@@ -268,27 +230,27 @@ def generate_xml_output(data):
         ET.SubElement(file_elem, "content").text = file['content']
     return ET.tostring(root, encoding="unicode")
 
-def generate_html_output(data):
+def generate_html_output(data: DirectoryAnalysis):
     output = f"""
     <html>
     <head>
-        <title>Codebase Analysis for: {html.escape(data['name'])}</title>
+        <title>Codebase Analysis for: {html.escape(data.name)}</title>
         <style>
             pre {{ white-space: pre-wrap; word-wrap: break-word; }}
         </style>
     </head>
     <body>
-    <h1>Codebase Analysis for: {html.escape(data['name'])}</h1>
+    <h1>Codebase Analysis for: {html.escape(data.name)}</h1>
     <h2>Directory Structure</h2>
     <pre>{html.escape(generate_tree_string(data, show_size=True, show_ignored=True))}</pre>
     <h2>Summary</h2>
     <ul>
-    <li>Total files: {data['file_count']}</li>
-    <li>Total directories: {data['dir_count']}</li>
-    <li>Analyzed size: {data['size'] / 1024:.2f} KB</li>
-    <li>Total text file size (including ignored): {data['total_text_size'] / 1024:.2f} KB</li>
-    <li>Total tokens: {data['total_tokens']}</li>
-    <li>Analyzed text content size: {data['text_content_size'] / 1024:.2f} KB</li>
+    <li>Total files: {data.get_file_count()}</li>
+    <li>Total directories: {data.get_dir_count()}</li>
+    <li>Analyzed size: {data.get_total_text_file_size() / 1024:.2f} KB</li>
+    <li>Total text file size (including ignored): {data.get_total_text_file_size() / 1024:.2f} KB</li>
+    <li>Total tokens: {data.get_total_tokens()}</li>
+    <li>Analyzed text content size: {data.get_text_content_size() / 1024:.2f} KB</li>
     </ul>
     <h2>File Contents</h2>
     """
@@ -475,8 +437,8 @@ def main():
         print(Fore.RED + f"An error occurred: {str(e)}" + Style.RESET_ALL)
         sys.exit(1)
 
-    if data['text_content_size'] / 1024 > args.max_size:
-        print(Fore.RED + f"\nWarning: The text content size ({data['text_content_size'] / 1024:.2f} KB) exceeds the maximum allowed size ({args.max_size} KB)." + Style.RESET_ALL)
+    if data.get_text_content_size() / 1024 > args.max_size:
+        print(Fore.RED + f"\nWarning: The text content size ({data.get_text_content_size() / 1024:.2f} KB) exceeds the maximum allowed size ({args.max_size} KB)." + Style.RESET_ALL)
         proceed = input_handler.get_input("Do you want to proceed? (y/n): ")
         if proceed != 'y':
             print(Fore.YELLOW + "Analysis aborted." + Style.RESET_ALL)
