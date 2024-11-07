@@ -22,42 +22,77 @@ class TestNodeAnalysis(unittest.TestCase):
             self.assertEqual(directory.get_file_count(), 0)
             self.assertEqual(directory.get_dir_count(), 0)
             self.assertEqual(directory.get_total_tokens(), 0)
-            self.assertEqual(directory.get_text_content_size(), 0)
-            self.assertEqual(directory.get_total_text_file_size(), 0)
+            self.assertEqual(directory.get_non_ignored_text_content_size(), 0)
+            self.assertEqual(directory.size, 0)
         
         def test_directory_with_one_text_file(self):
             directory = DirectoryAnalysis("test")
             text_file = TextFileAnalysis("test")
             text_file.file_content = "length of this string is 27"
-            text_file.size = 27
 
             directory.children.append(text_file)
             self.assertEqual(directory.get_file_count(), 1)
             self.assertEqual(directory.get_dir_count(), 0)
-            self.assertEqual(directory.get_text_content_size(), 27)
-            self.assertEqual(directory.get_total_text_file_size(), 27)
+            self.assertEqual(directory.get_non_ignored_text_content_size(), 27)
+            self.assertEqual(directory.size, 27)
 
         def test_directory_with_ten_files(self):
             directory = DirectoryAnalysis("test")
             for i in range(10):
                 text_file = TextFileAnalysis("test")
                 text_file.file_content = "length of this string is 27"
-                text_file.size = 27
                 directory.children.append(text_file)
             self.assertEqual(directory.get_file_count(), 10)
             self.assertEqual(directory.get_dir_count(), 0)
-            self.assertEqual(directory.get_text_content_size(), 270)
-            self.assertEqual(directory.get_total_text_file_size(), 270)
+            self.assertEqual(directory.get_non_ignored_text_content_size(), 270)
+            self.assertEqual(directory.size, 270)
 
         def test_directory_with_one_sub_directory(self):
             directory = DirectoryAnalysis("test")
             sub_directory = DirectoryAnalysis("test")
             text_file = TextFileAnalysis("test")
             text_file.file_content = "length of this string is 27"
-            text_file.size = 27
             sub_directory.children.append(text_file)
             directory.children.append(sub_directory)
             self.assertEqual(directory.get_file_count(), 1)
             self.assertEqual(directory.get_dir_count(), 1)
-            self.assertEqual(directory.get_text_content_size(), 27)
-            self.assertEqual(directory.get_total_text_file_size(), 27)
+            self.assertEqual(directory.get_non_ignored_text_content_size(), 27)
+            self.assertEqual(directory.size, 27)
+
+        def test_directory_with_one_ignored_file(self):
+            directory = DirectoryAnalysis("test")
+            text_file = TextFileAnalysis("test")
+            text_file.is_ignored = True
+            text_file.file_content = "length of this string is 27"
+            directory.children.append(text_file)
+            self.assertEqual(directory.get_file_count(), 0)
+            self.assertEqual(directory.get_dir_count(), 0)
+            self.assertEqual(directory.get_non_ignored_text_content_size(), 0)
+            self.assertEqual(directory.size, 27)
+
+        def test_directory_with_one_ignored_sub_directory(self):
+            directory = DirectoryAnalysis("test")
+            sub_directory = DirectoryAnalysis("test")
+            sub_directory.is_ignored = True
+            text_file = TextFileAnalysis("test")
+            text_file.file_content = "length of this string is 27"
+            sub_directory.children.append(text_file)
+            directory.children.append(sub_directory)
+            self.assertEqual(directory.get_file_count(), 0)
+            self.assertEqual(directory.get_dir_count(), 0)
+            self.assertEqual(directory.get_non_ignored_text_content_size(), 0)
+            self.assertEqual(directory.size, 27)
+
+        def test_directory_with_one_ignored_file_and_one_text_file(self):
+            directory = DirectoryAnalysis("test")
+            text_file = TextFileAnalysis("test")
+            text_file.is_ignored = True
+            text_file.file_content = "length of this string is 27"
+            directory.children.append(text_file)
+            text_file = TextFileAnalysis("test")
+            text_file.file_content = "length of this string is 27"
+            directory.children.append(text_file)
+            self.assertEqual(directory.get_file_count(), 1)
+            self.assertEqual(directory.get_dir_count(), 0)
+            self.assertEqual(directory.get_non_ignored_text_content_size(), 27)
+            self.assertEqual(directory.size, 54)

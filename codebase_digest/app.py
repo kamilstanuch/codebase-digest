@@ -117,8 +117,7 @@ def analyze_directory(path, ignore_patterns, base_path, include_git=False, max_d
                 else:
                     content = "[Non-text file]"
                     print(f"Debug: Non-text file {item_path}, size: {file_size}")
-                child = TextFileAnalysis(name=item, 
-                                         size=file_size, 
+                child = TextFileAnalysis(name=item,
                                          file_content=content, 
                                          is_ignored=is_ignored)
                 result.children.append(child)
@@ -168,9 +167,9 @@ def generate_summary_string(data: DirectoryAnalysis, estimated_size, use_color=T
     summary += f"Total files analyzed: {data.get_file_count()}\n"
     summary += f"Total directories analyzed: {data.get_dir_count()}\n"
     summary += f"Estimated output size: {estimated_size / 1024:.2f} KB\n"
-    summary += f"Actual analyzed size: {data.get_total_text_file_size() / 1024:.2f} KB\n"
+    summary += f"Actual analyzed size: {data.get_non_ignored_text_content_size() / 1024:.2f} KB\n"
     summary += f"Total tokens: {data.get_total_tokens()}\n"
-    summary += f"Actual text content size: {data.get_text_content_size() / 1024:.2f} KB\n"
+    summary += f"Actual text content size: {data.size / 1024:.2f} KB\n"
     
     if use_color:
         return Fore.CYAN + summary + Style.RESET_ALL
@@ -202,10 +201,9 @@ def generate_markdown_output(data: DirectoryAnalysis):
     output += "## Summary\n\n"
     output += f"- Total files: {data.get_file_count()}\n"
     output += f"- Total directories: {data.get_dir_count()}\n"
-    output += f"- Analyzed size: {data.get_text_content_size() / 1024:.2f} KB\n"
-    output += f"- Total text file size (including ignored): {data.get_total_text_file_size() / 1024:.2f} KB\n"
+    output += f"- Total text file size (including ignored): {data.size / 1024:.2f} KB\n"
     output += f"- Total tokens: {data.get_total_tokens()}\n"
-    output += f"- Analyzed text content size: {data.get_text_content_size() / 1024:.2f} KB\n\n"
+    output += f"- Analyzed text content size: {data.get_non_ignored_text_content_size() / 1024:.2f} KB\n\n"
     output += "## File Contents\n\n"
     for file in generate_content_string(data):
         output += f"### {file['path']}\n\n```\n{file['content']}\n```\n\n"
@@ -219,10 +217,9 @@ def generate_xml_output(data: DirectoryAnalysis):
     summary = ET.SubElement(root, "summary")
     ET.SubElement(summary, "total-files").text = str(data.get_file_count())
     ET.SubElement(summary, "total-directories").text = str(data.get_dir_count())
-    ET.SubElement(summary, "analyzed-size-kb").text = f"{data.get_total_text_file_size() / 1024:.2f}"
-    ET.SubElement(summary, "total-text-file-size-kb").text = f"{data.get_total_text_file_size / 1024:.2f}"
+    ET.SubElement(summary, "total-text-file-size-kb").text = f"{data.size / 1024:.2f}"
     ET.SubElement(summary, "total-tokens").text = str(data.get_total_tokens())
-    ET.SubElement(summary, "analyzed-text-content-size-kb").text = f"{data.get_text_content_size() / 1024:.2f}"
+    ET.SubElement(summary, "analyzed-text-content-size-kb").text = f"{data.get_non_ignored_text_content_size() / 1024:.2f}"
     contents = ET.SubElement(root, "file-contents")
     for file in generate_content_string(data):
         file_elem = ET.SubElement(contents, "file")
@@ -247,10 +244,9 @@ def generate_html_output(data: DirectoryAnalysis):
     <ul>
     <li>Total files: {data.get_file_count()}</li>
     <li>Total directories: {data.get_dir_count()}</li>
-    <li>Analyzed size: {data.get_total_text_file_size() / 1024:.2f} KB</li>
-    <li>Total text file size (including ignored): {data.get_total_text_file_size() / 1024:.2f} KB</li>
+    <li>Total text file size (including ignored): {data.size / 1024:.2f} KB</li>
     <li>Total tokens: {data.get_total_tokens()}</li>
-    <li>Analyzed text content size: {data.get_text_content_size() / 1024:.2f} KB</li>
+    <li>Analyzed text content size: {data.get_non_ignored_text_content_size() / 1024:.2f} KB</li>
     </ul>
     <h2>File Contents</h2>
     """
@@ -437,8 +433,8 @@ def main():
         print(Fore.RED + f"An error occurred: {str(e)}" + Style.RESET_ALL)
         sys.exit(1)
 
-    if data.get_text_content_size() / 1024 > args.max_size:
-        print(Fore.RED + f"\nWarning: The text content size ({data.get_text_content_size() / 1024:.2f} KB) exceeds the maximum allowed size ({args.max_size} KB)." + Style.RESET_ALL)
+    if data.get_non_ignored_text_content_size() / 1024 > args.max_size:
+        print(Fore.RED + f"\nWarning: The text content size ({data.get_non_ignored_text_content_size() / 1024:.2f} KB) exceeds the maximum allowed size ({args.max_size} KB)." + Style.RESET_ALL)
         proceed = input_handler.get_input("Do you want to proceed? (y/n): ")
         if proceed != 'y':
             print(Fore.YELLOW + "Analysis aborted." + Style.RESET_ALL)

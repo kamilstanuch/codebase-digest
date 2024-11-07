@@ -5,11 +5,14 @@ import tiktoken
 @dataclass
 class NodeAnalysis:
     name: str = ""
-    size: int = 0
     is_ignored: bool = False
 
     @property
     def type(self) -> str:
+        return NotImplemented
+    
+    @property
+    def size(self) -> int:
         return NotImplemented
 
 @dataclass
@@ -20,6 +23,9 @@ class TextFileAnalysis(NodeAnalysis):
     def type(self) -> str:
         return "text_file"
     
+    @property
+    def size(self) -> int:
+        return len(self.file_content)
     
     def count_tokens(self):
         """Counts the number of tokens in a text string."""
@@ -73,7 +79,18 @@ class DirectoryAnalysis(NodeAnalysis):
                 tokens += child.get_total_tokens()
         return tokens
 
-    def get_text_content_size(self) -> int:
+    @property
+    def size(self) -> int:
+        size = 0
+        for child in self.children:
+            if isinstance(child, TextFileAnalysis):
+                 size += child.size
+            elif isinstance(child, DirectoryAnalysis):
+                 size += child.size
+
+        return size
+
+    def get_non_ignored_text_content_size(self) -> int:
         size = 0
         for child in self.children:
             if child.is_ignored:
@@ -82,15 +99,5 @@ class DirectoryAnalysis(NodeAnalysis):
             if isinstance(child, TextFileAnalysis) and child.file_content:
                 size += len(child.file_content)
             elif isinstance(child, DirectoryAnalysis):
-               size += child.get_text_content_size()
+               size += child.size
         return size
-
-    def get_total_text_file_size(self) -> int:
-        size = 0
-        for child in self.children:
-            if isinstance(child, TextFileAnalysis):
-                 size += child.size
-            elif isinstance(child, DirectoryAnalysis):
-                 size += child.get_total_text_file_size()
-
-        return size     
