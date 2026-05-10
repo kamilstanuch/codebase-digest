@@ -82,6 +82,8 @@ Examples:
    cdigest /path/to/my_project --copy-to-clipboard
    ```
 
+To publish your digest to the [understand-quickly](https://github.com/looptech-ai/understand-quickly) registry (opt-in, machine-readable index of code-context artifacts for AI agents), see [`PUBLISHING.md`](PUBLISHING.md).
+
 ## Configuration
 
 | Option | Description |
